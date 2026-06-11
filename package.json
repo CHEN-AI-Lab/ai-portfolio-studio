@@ -16,8 +16,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,scss}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,scss}\"",
     "clean": "turbo clean && rm -rf node_modules",
-    "ci": "pnpm install --frozen-lockfile && turbo build",
-    "prepare": "husky || true"
+    "ci": "pnpm install --frozen-lockfile && turbo build"
   },
 
   "devDependencies": {
