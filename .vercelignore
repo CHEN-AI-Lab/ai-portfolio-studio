@@ -1,0 +1,25 @@
+# Vercel deployment: ignore non-web parts of monorepo
+apps/*/node_modules/
+apps/*/.next/
+apps/*/.turbo/
+
+# Exclude user-uploads from web app
+apps/web/public/user-uploads/
+
+# Development artifacts
+node_modules/
+.next/
+.turbo/
+dist/
+coverage/
+
+# Monorepo other apps (only web matters)
+apps/studio/
+apps/docs/
+
+# Root works directory (media origin, not needed for deployment)
+works/
+works/_inbox/
+
+# Lock file included so Vercel detects pnpm
+# pnpm-lock.yaml — KEEP

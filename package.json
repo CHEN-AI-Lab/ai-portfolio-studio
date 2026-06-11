@@ -19,13 +19,7 @@
     "ci": "pnpm install --frozen-lockfile && turbo build",
     "prepare": "husky || true"
   },
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.5.0",
-      "onFail": "download"
-    }
-  },
+
   "devDependencies": {
     "prettier": "^3.4.0",
     "turbo": "^2.4.0",
