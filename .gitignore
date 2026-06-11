@@ -7,3 +7,8 @@ dist/
 .DS_Store
 coverage/
 .vercel
+
+# Large media assets (too big for git)
+apps/web/public/user-uploads/
+works/
+works/_inbox/
