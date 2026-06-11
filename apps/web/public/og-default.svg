@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A0A0F"/>
+      <stop offset="100%" stop-color="#12121A"/>
+    </linearGradient>
+    <linearGradient id="acc" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="50%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="900" cy="315" r="300" fill="url(#acc)" opacity="0.06"/>
+  <circle cx="300" cy="200" r="200" fill="rgba(124,58,237,0.04)"/>
+  <text x="120" y="280" font-family="system-ui, sans-serif" font-size="72" font-weight="800" fill="#FFFFFF">AI Creative</text>
+  <text x="120" y="360" font-family="system-ui, sans-serif" font-size="72" font-weight="800" fill="url(#acc)">Studio</text>
+  <text x="120" y="420" font-family="system-ui, sans-serif" font-size="20" fill="#6B6B80">AI Animation Drama · Concept Trailer · Creative Shorts</text>
+  <text x="120" y="540" font-family="system-ui, sans-serif" font-size="16" fill="#3A3A4A">aicreative.studio</text>
+</svg>

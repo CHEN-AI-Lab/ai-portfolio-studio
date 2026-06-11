@@ -1,0 +1,576 @@
+// ─── Resume Page ───────────────────────────────────────────────────
+// Timeline layout with skill tags
+
+@import 'variables';
+@import 'mixins';
+
+.resume-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 6rem 1rem 3rem;
+  background: $bg-base;
+  min-height: 100vh;
+
+  @include respond-below('md') {
+    padding: 5rem 1rem 2rem;
+  }
+}
+
+// ─── Header ───────────────────────────────────────────────────────
+
+.resume-page__header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+
+  @include respond-below('sm') {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+}
+
+.resume-page__avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7C3AED, #EC4899);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.25rem;
+  font-weight: $fw-bold;
+  color: #fff;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+
+  @include respond-below('sm') {
+    width: 76px;
+    height: 76px;
+    font-size: 1.85rem;
+  }
+}
+
+.resume-page__info {
+  flex: 1;
+}
+
+.resume-page__name {
+  font-size: $fs-3xl;
+  font-weight: $fw-extrabold;
+  @include gradient-text;
+  margin-bottom: $space-1;
+
+  @include respond-below('sm') {
+    font-size: $fs-2xl;
+  }
+}
+
+.resume-page__subtitle {
+  font-size: $fs-base;
+  color: $text-secondary;
+  line-height: $lh-relaxed;
+
+  @include respond-below('sm') {
+    font-size: $fs-sm;
+  }
+}
+
+.resume-page__header-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: $fs-sm;
+  color: $text-tertiary;
+  text-decoration: none;
+  margin-top: $space-2;
+  transition: all $transition-base;
+
+  &:hover {
+    color: $color-accent-light;
+  }
+}
+
+.resume-page__header-email-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: $fs-sm;
+  color: $text-tertiary;
+  background: none;
+  border: 1px dashed $border-light;
+  border-radius: $radius-md;
+  padding: $space-1 0;
+  margin-top: $space-2;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    color: #C4B5FD;
+    border-color: rgba(124, 58, 237, 0.3);
+    background: rgba(124, 58, 237, 0.06);
+  }
+}
+
+// ─── Section ──────────────────────────────────────────────────────
+
+.resume-page__section {
+  margin-bottom: $space-10;
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      rgba(124, 58, 237, 0.3) 0%,
+      rgba(236, 72, 153, 0.15) 50%,
+      transparent 100%
+    );
+    margin-top: $space-10;
+  }
+
+  &:last-of-type::after {
+    display: none;
+  }
+}
+
+.resume-page__section-title {
+  font-size: $fs-xl;
+  font-weight: $fw-bold;
+  color: $text-primary;
+  margin-bottom: $space-6;
+  position: relative;
+  padding-left: $space-4;
+  border-left: 3px solid $color-primary;
+
+  @include respond-below('sm') {
+    font-size: $fs-lg;
+  }
+}
+
+// ─── Timeline ─────────────────────────────────────────────────────
+
+.resume-page__timeline {
+  position: relative;
+  padding-left: 2rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: linear-gradient(180deg, #7C3AED, #EC4899);
+    border-radius: 2px;
+  }
+}
+
+.resume-page__timeline-item {
+  position: relative;
+  padding-bottom: $space-8;
+  transition: all $transition-base;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  &:hover {
+    .resume-page__timeline-title {
+      color: $color-accent-light;
+    }
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -28px; // centered on timeline line: parent padding-left:32px, line at 7px from timeline left, dot radius 5px → 7 - 5 - 32 = -30
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7C3AED, #EC4899);
+    border: 2px solid $bg-base;
+    box-shadow: 0 0 0 2px $color-primary;
+    z-index: 1;
+  }
+}
+
+.resume-page__timeline-title {
+  font-size: $fs-base;
+  font-weight: $fw-semibold;
+  color: $text-primary;
+  margin-bottom: $space-1;
+
+  @include respond-below('sm') {
+    font-size: $fs-sm;
+  }
+}
+
+.resume-page__timeline-company {
+  font-size: $fs-sm;
+  color: $color-accent-light;
+  margin-bottom: $space-1;
+}
+
+.resume-page__timeline-date {
+  font-size: $fs-xs;
+  color: $text-tertiary;
+  margin-bottom: $space-2;
+}
+
+.resume-page__timeline-desc {
+  font-size: $fs-sm;
+  color: $text-secondary;
+  line-height: $lh-relaxed;
+  white-space: pre-line;
+}
+
+// ─── Skill Tags ───────────────────────────────────────────────────
+
+.resume-page__skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.resume-page__skill-tag {
+  background: rgba(124, 58, 237, 0.12);
+  color: #A78BFA;
+  border-radius: 20px;
+  padding: 0.45rem 1.1rem;
+  font-size: $fs-sm;
+  font-weight: $fw-medium;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  transition: all $transition-base;
+  letter-spacing: 0.02em;
+
+  &:hover {
+    background: rgba(124, 58, 237, 0.22);
+    color: #C4B5FD;
+    border-color: rgba(124, 58, 237, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+  }
+
+  // Subtle variation based on skill type
+  &:nth-child(3n+2) {
+    background: rgba(236, 72, 153, 0.1);
+    border-color: rgba(236, 72, 153, 0.2);
+    color: #F9A8D4;
+
+    &:hover {
+      background: rgba(236, 72, 153, 0.2);
+      border-color: rgba(236, 72, 153, 0.4);
+      color: #FBCFE8;
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
+    }
+  }
+
+  &:nth-child(3n+3) {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
+    color: #93C5FD;
+
+    &:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: rgba(59, 130, 246, 0.4);
+      color: #BFDBFE;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+  }
+}
+
+// ─── Education ────────────────────────────────────────────────────
+
+.resume-page__education-item {
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+  margin-bottom: $space-4;
+  transition: all $transition-base;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    background: rgba(124, 58, 237, 0.04);
+    border-color: rgba(124, 58, 237, 0.2);
+  }
+}
+
+.resume-page__education-row {
+  display: flex;
+  align-items: center;
+}
+
+.resume-page__education-school {
+  flex: 1;
+  font-size: $fs-base;
+  font-weight: $fw-semibold;
+  color: $text-primary;
+  text-align: left;
+}
+
+.resume-page__education-title {
+  flex: 1;
+  font-size: $fs-sm;
+  color: $color-accent-light;
+  font-weight: $fw-medium;
+  text-align: center;
+}
+
+.resume-page__education-date {
+  flex: 1;
+  font-size: $fs-xs;
+  color: $text-tertiary;
+  text-align: right;
+}
+
+// ─── Certificates ─────────────────────────────────────────────────
+
+.resume-page__cert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.resume-page__cert-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: $space-4 $space-5;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+  font-size: $fs-sm;
+  color: $text-primary;
+  font-weight: $fw-medium;
+  transition: all $transition-base;
+  letter-spacing: 0.01em;
+
+  &:hover {
+    background: rgba(124, 58, 237, 0.06);
+    border-color: rgba(124, 58, 237, 0.25);
+    transform: translateX(4px);
+  }
+
+  &::before {
+    content: '🏅';
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+}
+
+// ─── Contact ──────────────────────────────────────────────────────
+
+.resume-page__contact-card {
+  padding: $space-4 $space-5;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba(124, 58, 237, 0.06);
+    border-color: rgba(124, 58, 237, 0.2);
+  }
+}
+
+.resume-page__contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: $fs-sm;
+  color: $color-accent-light;
+  text-decoration: none;
+  font-weight: $fw-medium;
+  transition: all $transition-base;
+
+  &:hover {
+    color: #C4B5FD;
+  }
+}
+
+// ─── Download Button ──────────────────────────────────────────────
+
+.resume-page__download {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3 $space-8;
+  font-size: $fs-base;
+  font-weight: $fw-semibold;
+  color: #fff;
+  background: linear-gradient(135deg, #7C3AED, #EC4899);
+  border: none;
+  border-radius: $radius-full;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @include respond-below('sm') {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// ─── Print Styles ────────────────────────────────────────────────
+// Hide nav, footer, scroll-to-top, language switch, and the download
+// button itself when printing — only the resume content shows up.
+
+@media print {
+  @page {
+    margin: 0.5in;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  html, body, #main-content, main, .page-transition {
+    background: #fff !important;
+    color: #1a1a1a !important;
+  }
+
+  .header,
+  .header__mobile-nav,
+  footer,
+  .scroll-to-top,
+  .resume-page__download,
+  .resume-page__header-email-btn {
+    display: none !important;
+  }
+
+  .resume-page {
+    padding: 0 !important;
+    min-height: auto !important;
+    max-width: 100%;
+    background: #fff !important;
+    color: #1a1a1a !important;
+  }
+
+  .resume-page__header {
+    margin-bottom: 1.5rem;
+  }
+
+  .resume-page__section {
+    margin-bottom: 1.25rem;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .resume-page__section::after {
+    margin-top: 1.25rem;
+  }
+
+  .resume-page__section:last-of-type {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  .resume-page__section::after {
+    background: linear-gradient(90deg, #7C3AED 0%, rgba(124, 58, 237, 0.2) 100%) !important;
+  }
+
+  .resume-page__name {
+    background: linear-gradient(135deg, #7C3AED, #EC4899) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: #7C3AED !important;
+  }
+
+  .resume-page__avatar {
+    background: linear-gradient(135deg, #7C3AED, #EC4899) !important;
+    color: #fff !important;
+  }
+
+  .resume-page__section-title {
+    color: #1a1a1a !important;
+    border-left-color: #7C3AED !important;
+  }
+
+  .resume-page__subtitle {
+    color: #555 !important;
+  }
+
+  .resume-page__header-email {
+    color: #666 !important;
+  }
+
+  .resume-page__timeline-title,
+  .resume-page__education-school,
+  .resume-page__education-title,
+  .resume-page__cert-item {
+    color: #1a1a1a !important;
+  }
+
+  .resume-page__timeline-company {
+    color: #7C3AED !important;
+  }
+
+  .resume-page__timeline-date,
+  .resume-page__education-date {
+    color: #666 !important;
+  }
+
+  .resume-page__timeline-desc {
+    color: #333 !important;
+  }
+
+  .resume-page__education-item,
+  .resume-page__cert-item,
+  .resume-page__contact-card {
+    background: #f5f5f5 !important;
+    border-color: #ddd !important;
+  }
+
+  .resume-page__skill-tag {
+    background: rgba(124, 58, 237, 0.08) !important;
+    border-color: rgba(124, 58, 237, 0.3) !important;
+    color: #7C3AED !important;
+  }
+
+  .resume-page__skill-tag:nth-child(3n+2) {
+    background: rgba(236, 72, 153, 0.08) !important;
+    border-color: rgba(236, 72, 153, 0.3) !important;
+    color: #BE185D !important;
+  }
+
+  .resume-page__skill-tag:nth-child(3n+3) {
+    background: rgba(59, 130, 246, 0.08) !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+    color: #2563EB !important;
+  }
+
+  .resume-page__timeline::before {
+    background: #7C3AED !important;
+  }
+
+  .resume-page__timeline-item::before {
+    background: linear-gradient(135deg, #7C3AED, #EC4899) !important;
+    border-color: #fff !important;
+    box-shadow: 0 0 0 2px #7C3AED !important;
+  }
+
+  .resume-page__section {
+    break-inside: avoid;
+  }
+}

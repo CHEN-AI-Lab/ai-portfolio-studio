@@ -1,0 +1,339 @@
+// ─── Header ───────────────────────────────────────────────────────
+// Fixed glass-effect navigation bar
+
+@import 'variables';
+@import 'mixins';
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $z-navbar;
+  height: $header-height;
+  @include glass-effect(rgba(10, 10, 15, 0.85), rgba(255, 255, 255, 0.06), 20px);
+  border-bottom: 1px solid $border-light;
+  transition: background $transition-base, border-color $transition-base;
+
+  &.scrolled {
+    background: rgba(10, 10, 15, 0.95);
+    border-bottom-color: $border-medium;
+  }
+
+  @include respond-below('md') {
+    height: $header-height-mobile;
+  }
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: 0 $content-padding;
+
+  @include respond-below('md') {
+    padding: 0 $content-padding-mobile;
+  }
+}
+
+// ─── Logo ─────────────────────────────────────────────────────────
+
+.header__logo {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  text-decoration: none;
+  font-size: $fs-xl;
+  font-weight: $fw-bold;
+  @include gradient-text;
+  letter-spacing: 0.05em;
+  transition: opacity $transition-fast;
+  white-space: nowrap;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  .header__logo-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  span { // no nesting — compiles to .header__logo span (direct child of logo)
+    display: inline;
+    background: linear-gradient(135deg, #7C3AED, #EC4899, #3B82F6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  @include respond-below('sm') {
+    font-size: $fs-base;
+  }
+}
+
+// ─── Desktop Nav ──────────────────────────────────────────────────
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: $space-8;
+
+  @include respond-below('md') {
+    display: none;
+  }
+}
+
+.header__nav-list {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+}
+
+.header__nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: $space-2 $space-4;
+  font-size: $fs-sm;
+  font-weight: $fw-medium;
+  color: $text-secondary;
+  text-decoration: none;
+  border-radius: $radius-lg;
+  transition: color $transition-fast, background $transition-fast;
+  letter-spacing: 0.02em;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: $space-4;
+    right: $space-4;
+    height: 2px;
+    background: $gradient-primary;
+    border-radius: $radius-full;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform $transition-base;
+  }
+
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.04);
+
+    &::after {
+      transform: scaleX(1);
+    }
+  }
+
+  &.active {
+    color: $text-primary;
+
+    &::after {
+      transform: scaleX(1);
+    }
+  }
+}
+
+// ─── Header Actions (Language Switcher + Mobile Toggle) ──────────
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+}
+
+// ─── Mobile Menu Toggle ───────────────────────────────────────────
+
+.header__menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-lg;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid $border-light;
+  color: $text-primary;
+  cursor: pointer;
+  transition: background $transition-fast;
+  position: relative;
+  z-index: $z-overlay + 1;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  @include respond-below('md') {
+    display: flex;
+  }
+}
+
+// Hamburger icon — three lines that morph into an X
+.header__hamburger {
+  width: 20px;
+  height: 16px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: $text-primary;
+    border-radius: 2px;
+    transition: all $transition-base;
+    transform-origin: center;
+  }
+
+  &.open {
+    span {
+      &:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      &:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0);
+      }
+      &:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+    }
+  }
+}
+
+// ─── Mobile Menu Overlay ─────────────────────────────────────────
+
+.header__mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: $z-overlay - 1;
+  opacity: 0;
+  transition: opacity $transition-base;
+
+  &.visible {
+    opacity: 1;
+  }
+
+  @include respond-below('md') {
+    display: block;
+    pointer-events: none;
+
+    &.visible {
+      pointer-events: all;
+    }
+  }
+}
+
+// ─── Mobile Nav Dropdown ─────────────────────────────────────────
+
+.header__mobile-nav {
+  display: none;
+  position: fixed;
+  top: $header-height-mobile;
+  left: 0;
+  right: 0;
+  background: rgba(10, 10, 15, 0.98);
+  border-bottom: 1px solid $border-medium;
+  z-index: $z-overlay;
+  padding: $space-4;
+  max-height: calc(100vh - $header-height-mobile);
+  overflow-y: auto;
+
+  &.open {
+    display: block;
+    animation: slideDown 0.3s ease forwards;
+  }
+
+  @include respond-below('md') {
+    display: none;
+
+    &.open {
+      display: block;
+    }
+  }
+
+  .header__mobile-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  .header__mobile-nav-link {
+    display: flex;
+    align-items: center;
+    padding: $space-3 $space-4;
+    font-size: $fs-base;
+    font-weight: $fw-medium;
+    color: $text-secondary;
+    text-decoration: none;
+    border-radius: $radius-lg;
+    transition: all $transition-fast;
+
+    &:hover,
+    &.active {
+      color: $text-primary;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &.active {
+      @include gradient-text;
+    }
+  }
+
+  .header__mobile-divider {
+    height: 1px;
+    background: $border-light;
+    margin: $space-3 0;
+  }
+}
+
+// ─── Language Switcher ────────────────────────────────────────────
+// Shared styles for the language toggle button (also used standalone)
+
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-1;
+  padding: $space-1 $space-3;
+  font-size: $fs-xs;
+  font-weight: $fw-semibold;
+  color: $text-secondary;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid $border-light;
+  border-radius: $radius-full;
+  cursor: pointer;
+  transition: all $transition-fast;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  min-width: 48px;
+
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: $border-medium;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  .language-switcher__icon {
+    font-size: 0.875rem;
+    line-height: 1;
+  }
+}

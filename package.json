@@ -1,0 +1,44 @@
+{
+  "name": "ai-portfolio-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Portfolio Studio — A beautiful portfolio website for AI video creators to showcase their works",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "start": "turbo start",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "generate:works": "node scripts/generate-works.mjs",
+    "classify": "node scripts/classify-works.mjs",
+    "classify:apply": "node scripts/classify-works.mjs --apply",
+    "prebuild": "node scripts/generate-works.mjs",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,scss}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,scss}\"",
+    "clean": "turbo clean && rm -rf node_modules",
+    "ci": "pnpm install --frozen-lockfile && turbo build",
+    "prepare": "husky || true"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.5.0",
+      "onFail": "download"
+    }
+  },
+  "devDependencies": {
+    "prettier": "^3.4.0",
+    "turbo": "^2.4.0",
+    "husky": "^9.1.0",
+    "lint-staged": "^15.2.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": ["eslint --fix", "prettier --write"],
+    "*.{json,md,scss}": ["prettier --write"]
+  },
+  "packageManager": "pnpm@11.5.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=11.5.0"
+  }
+}

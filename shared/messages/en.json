@@ -1,0 +1,198 @@
+{
+  "nav": {
+    "home": "Home",
+    "works": "Works",
+    "about": "About",
+    "contact": "Contact",
+    "resume": "Resume"
+  },
+  "hero": {
+    "title": "AI Creative Studio",
+    "subtitle": "Exploring the boundless possibilities of AI and visual art — a portfolio of AI animation dramas, live-action shorts, concept trailers, and creative visuals",
+    "cta": "Browse Works"
+  },
+  "categories": {
+    "ai-animation-drama": {
+      "label": "AI Animation Drama",
+      "description": "AI-generated animation-style narrative works that blend manga storyboarding with dynamic motion, creating immersive anime storytelling experiences"
+    },
+    "ai-live-drama": {
+      "label": "AI Live-Action Short Drama",
+      "description": "Live-action style short dramas created with AI video generation technology, spanning historical, modern, sci-fi, and more genres"
+    },
+    "ai-concept-trailer": {
+      "label": "AI Concept Trailer",
+      "description": "Cinematic concept trailers produced with AI tools, showcasing visual creativity and narrative vision in short-form format"
+    },
+    "ai-creative-short": {
+      "label": "AI Creative Short",
+      "description": "Experimental AI short-form videos exploring the limitless possibilities of AI in visual art, music visualization, and abstract storytelling"
+    },
+    "ai-image-art": {
+      "label": "AI Image Art",
+      "description": "High-quality AI-generated artwork created with Midjourney, Stable Diffusion, and other tools, spanning diverse styles and themes"
+    }
+  },
+  "work": {
+    "featured": "Featured Works",
+    "latest": "Latest Works",
+    "all": "All Works",
+    "filter": "Filter",
+    "filterByCategory": "Filter by Category",
+    "search": "Search works...",
+    "noResults": "No matching works found",
+    "noResultsHint": "Try adjusting your filters or searching with different keywords",
+    "viewDetails": "View Details",
+    "duration": "Duration",
+    "createdAt": "Created",
+    "tags": "Tags",
+    "previous": "Previous",
+    "next": "Next",
+    "clearTags": "Clear",
+        "noWorks": "No works in this category",
+        "sortLabel": "Sort by",
+        "sortNewest": "Newest first",
+    "sortOldest": "Oldest First",
+    "sortTitleAsc": "Title A-Z",
+    "sortTitleDesc": "Title Z-A",
+    "worksCount": "{count} works in {total} categories",
+    "back": "Back",
+    "description": "Description",
+    "info": "Information",
+    "category": "Category",
+    "type": "Type",
+    "related": "Related Works",
+    "video": "Video",
+    "image": "Image",
+    "preview": "Preview (embed your video link)",
+    "notFound": "Work Not Found",
+    "notFoundHint": "The work may have been deleted or the link is invalid",
+    "backToWorks": "Back to Works",
+    "sample": "View Sample",
+    "dramaSample": "Sample Work - AI Animation Drama 1",
+    "liveSample": "Sample Work - AI Live-Action Short 1",
+    "trailerSample": "Sample Work - Concept Trailer 1",
+    "filterByTag": "Filter by Tag",
+    "clearTags": "Clear"
+  },
+  "about": {
+    "title": "About Me",
+    "description": "I am an AI visual creator dedicated to producing high-quality visual content using AI technologies. From AI animation dramas to live-action shorts, from cinematic concept trailers to exquisite AI image art, I explore the fusion of artificial intelligence and creative expression.\n\nThis portfolio primarily features works created with **domestic Chinese AI tools** — Jimeng AI, Doubao, CapCut Pro, LiblibAI — alongside Midjourney, Stable Diffusion, and ComfyUI. Each piece represents the intersection of AI technology and human creativity, demonstrating the revolutionary potential of generative AI in the realm of visual storytelling.",
+    "skills": {
+      "title": "Skills",
+      "aiVideoGen": "AI Video Generation",
+      "aiImageGen": "AI Image Generation",
+      "promptEngineering": "Prompt Engineering",
+      "postProduction": "Post-Production & Editing",
+      "storytelling": "Visual Storytelling & Storyboarding",
+      "creativeDirection": "Creative Direction"
+    },
+    "tools": {
+      "title": "Tools & Skills",
+      "midjourney": "Midjourney",
+      "stableDiffusion": "Stable Diffusion",
+      "comfyui": "ComfyUI",
+      "jimeng": "Jimeng AI",
+      "doubao": "Doubao",
+      "jianying": "CapCut Pro",
+      "liblib": "LiblibAI",
+      "afterEffects": "After Effects",
+      "davinci": "DaVinci Resolve"
+    },
+    "stats": {
+      "totalWorks": "Total Works",
+      "totalVideos": "Videos",
+      "totalImages": "Images",
+      "totalViews": "Total Views",
+      "totalDuration": "Total Duration"
+    },
+    "followMe": "Follow Me",
+    "followMeHint": "Follow my latest works on these platforms",
+    "contactMe": "Contact Me",
+    "contactHint": "If you are interested in my work or have collaboration opportunities, feel free to reach out. I am currently looking for job opportunities in AI animation drama and AI short drama.",
+    "contactEmail": "Email",
+    "contactName": "Name",
+    "contactMessage": "Message",
+    "contactSubmit": "Send Message",
+    "contactSuccess": "Thank you for contacting me! I will get back to you soon."
+  },
+  "contact": {
+    "title": "Contact Me",
+    "subtitle": "Interested in my work or want to collaborate? Get in touch!",
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "email": "Email",
+    "emailPlaceholder": "your@email.com",
+    "subject": "Subject",
+    "subjectOptions": { "work": "Inquiry about Works", "collab": "Collaboration", "other": "Other" },
+    "message": "Message",
+    "messagePlaceholder": "Write your message here...",
+    "submit": "Send Message",
+    "sending": "Sending...",
+    "success": "Message sent! I'll get back to you soon",
+    "error": "Failed to send. Please try again later",
+    "required": "This field is required"
+  },
+  "resume": {
+    "title": "CHEN",
+    "subtitle": "AI Video Creator",
+    "download": "Download Resume",
+    "contact": "Contact",
+    "email": "phoebe.yanxi@gmail.com",
+    "emailReveal": "Click to show email",
+    "experience": "Experience",
+    "skills": "Skills",
+    "education": "Education",
+    "certificates": "Certificates",
+    "certificateEntries": [
+      "AIGC Art Designer (Senior)",
+      "NCRE Level 2",
+      "Teacher Qualification"
+    ],
+    "entries": [
+      {
+        "title": "Software Testing",
+        "company": "",
+        "date": "2022 — 2026",
+        "description": "Software functional testing, compatibility testing, and UX testing. Authored test cases, performed smoke and regression testing, tracked defect lifecycle, and delivered test reports."
+      },
+      {
+        "title": "E-commerce Operations",
+        "company": "",
+        "date": "2018 — 2022",
+        "description": "Managed product listings, page optimization, and daily operations on platforms including JD.com and Government Cloud Marketplace. Maintained product data accuracy, monitored platform metrics, and coordinated operational adjustments around promotion cycles."
+      }
+    ],
+    "educationEntries": [
+      {
+        "degree": "",
+        "school": "Shaanxi University of Technology",
+        "date": "2014 — 2018"
+      }
+    ]
+  },
+  "footer": {
+    "copyright": "© {year} AI Creative Studio. All rights reserved.",
+    "tagline": "Telling stories with AI, connecting the world through creativity",
+    "poweredBy": "Powered by Next.js & AI"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "errorHint": "Please try again later or contact the site administrator",
+    "retry": "Retry",
+    "comingSoon": "Coming Soon",
+    "comingSoonHint": "This feature is under development. Stay tuned!",
+    "notFound": "Page Not Found",
+    "notFoundDesc": "The page you are looking for does not exist or has been removed",
+    "backToHome": "Back to Home",
+    "close": "Close",
+    "menu": "Menu",
+    "languageSwitch": "Switch Language",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "copySuccess": "Copied",
+    "share": "Share",
+    "copyLink": "Copy Link"
+  }
+}

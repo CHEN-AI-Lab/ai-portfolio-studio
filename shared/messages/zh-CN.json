@@ -1,0 +1,198 @@
+{
+  "nav": {
+    "home": "首页",
+    "works": "作品",
+    "about": "关于",
+    "contact": "联系",
+    "resume": "简历"
+  },
+  "hero": {
+    "title": "AI 创艺工坊",
+    "subtitle": "探索人工智能与视觉艺术的无限可能 — AI 漫剧、真人短剧、概念预告片与创意视觉作品集",
+    "cta": "浏览作品"
+  },
+  "categories": {
+    "ai-animation-drama": {
+      "label": "AI 漫剧",
+      "description": "基于AI生成的动画风格叙事作品，融合漫画分镜与动态画面，打造沉浸式二次元故事体验"
+    },
+    "ai-live-drama": {
+      "label": "AI 真人短剧",
+      "description": "利用AI视频生成技术制作的真人风格短剧，涵盖古风、现代、科幻等多种题材"
+    },
+    "ai-concept-trailer": {
+      "label": "AI 概念预告片",
+      "description": "使用AI工具制作的电影级概念预告片，展示视觉创意与叙事能力的概念性短片"
+    },
+    "ai-creative-short": {
+      "label": "AI 创意短片",
+      "description": "实验性AI短视频作品，探索AI在视觉艺术、音乐可视化与抽象叙事中的无限可能"
+    },
+    "ai-image-art": {
+      "label": "AI 图像艺术",
+      "description": "通过Midjourney、Stable Diffusion等工具生成的高质量AI艺术作品，涵盖各类风格与主题"
+    }
+  },
+  "work": {
+    "featured": "精选作品",
+    "latest": "最新作品",
+    "all": "全部作品",
+    "filter": "筛选",
+    "filterByCategory": "按分类筛选",
+    "search": "搜索作品...",
+    "noResults": "没有找到匹配的作品",
+    "noResultsHint": "试试调整筛选条件或搜索其他关键词",
+    "viewDetails": "查看详情",
+    "duration": "时长",
+    "createdAt": "创作时间",
+    "tags": "标签",
+    "previous": "上一个",
+    "next": "下一个",
+    "clearTags": "清除",
+    "noWorks": "该分类暂无作品",
+    "sortLabel": "排序方式",
+    "sortNewest": "最新优先",
+    "sortOldest": "最早优先",
+    "sortTitleAsc": "标题 A-Z",
+    "sortTitleDesc": "标题 Z-A",
+    "worksCount": "共 {count} 个作品，{total} 个分类",
+    "back": "返回",
+    "description": "作品描述",
+    "info": "作品信息",
+    "category": "分类",
+    "type": "类型",
+    "related": "相关作品",
+    "video": "视频作品",
+    "image": "图片作品",
+    "preview": "视频预览（嵌入你的视频链接）",
+    "notFound": "作品未找到",
+    "notFoundHint": "该作品可能已被删除或链接无效",
+    "backToWorks": "返回作品集",
+    "sample": "查看样例",
+    "dramaSample": "样例作品 - AI 漫剧 1",
+    "liveSample": "样例作品 - AI 真人短剧 1",
+    "trailerSample": "样例作品 - 概念预告片 1",
+    "filterByTag": "按标签筛选",
+    "clearTags": "清除"
+  },
+  "about": {
+    "title": "关于我",
+    "description": "我是AI视觉创作者，专注于利用AI技术创作高质量的视觉内容。从AI动画剧集到真人风格短片，从电影级概念预告片到精致的AI图像艺术，我致力于探索人工智能与创意表达的融合边界。\n\n本作品集以**国内AI工具**为主力——即梦AI、豆包、剪映专业版、哩布哩布等，配合Midjourney、Stable Diffusion、ComfyUI等国际工具制作。每一件作品都是AI技术与人类创意的碰撞，展现生成式AI在视觉叙事领域的革命性潜力。",
+    "skills": {
+      "title": "专业技能",
+      "aiVideoGen": "AI 视频生成",
+      "aiImageGen": "AI 图像生成",
+      "promptEngineering": "提示词工程",
+      "postProduction": "后期制作与剪辑",
+      "storytelling": "视觉叙事与分镜设计",
+      "creativeDirection": "创意指导"
+    },
+    "tools": {
+      "title": "常用工具与技能",
+      "midjourney": "Midjourney",
+      "stableDiffusion": "Stable Diffusion",
+      "comfyui": "ComfyUI",
+      "jimeng": "即梦 AI",
+      "doubao": "豆包",
+      "jianying": "剪映专业版",
+      "liblib": "哩布哩布",
+      "afterEffects": "After Effects",
+      "davinci": "DaVinci Resolve"
+    },
+    "stats": {
+      "totalWorks": "作品总数",
+      "totalVideos": "视频作品",
+      "totalImages": "图像作品",
+      "totalViews": "总观看次数",
+      "totalDuration": "总时长"
+    },
+    "followMe": "关注我",
+    "followMeHint": "在以下平台关注我的最新作品",
+    "contactMe": "联系我",
+    "contactHint": "如果你对我的作品感兴趣，或有合作机会，欢迎联系我。我目前正在寻找 AI 漫剧/AI 真人短剧相关的工作机会。",
+    "contactEmail": "邮箱",
+    "contactName": "姓名",
+    "contactMessage": "消息",
+    "contactSubmit": "发送消息",
+    "contactSuccess": "感谢您联系我！我会尽快回复。"
+  },
+  "contact": {
+    "title": "联系我",
+    "subtitle": "对作品感兴趣或有合作意向？欢迎联系",
+    "name": "姓名",
+    "namePlaceholder": "你的名字",
+    "email": "邮箱",
+    "emailPlaceholder": "your@email.com",
+    "subject": "主题",
+    "subjectOptions": { "work": "作品咨询", "collab": "合作意向", "other": "其他" },
+    "message": "消息",
+    "messagePlaceholder": "写下你想说的话...",
+    "submit": "发送消息",
+    "sending": "发送中...",
+    "success": "消息已发送！我会尽快回复你",
+    "error": "发送失败，请稍后重试",
+    "required": "请填写此项"
+  },
+  "resume": {
+    "title": "CHEN",
+    "subtitle": "AI 视频创作者",
+    "download": "下载简历",
+    "contact": "联系方式",
+    "email": "phoebe.yanxi@gmail.com",
+    "emailReveal": "点击显示邮箱",
+    "experience": "工作经验",
+    "skills": "技能",
+    "education": "教育背景",
+    "certificates": "证书",
+    "certificateEntries": [
+      "AIGC艺术设计师（高级）",
+      "全国计算机等级考试二级",
+      "教师资格"
+    ],
+    "entries": [
+      {
+        "title": "软件测试",
+        "company": "",
+        "date": "2022 — 2026",
+        "description": "负责软件功能测试、兼容性测试及用户体验测试。编写测试用例，执行冒烟测试、回归测试，跟踪缺陷生命周期并输出测试报告。"
+      },
+      {
+        "title": "电商运营",
+        "company": "",
+        "date": "2018 — 2022",
+        "description": "负责京东、政采云等平台的产品上架、页面优化及日常运营管理。维护商品信息准确性，监控平台数据，配合活动节点进行站内运营调整。"
+      }
+    ],
+    "educationEntries": [
+      {
+        "degree": "",
+        "school": "陕西理工大学",
+        "date": "2014 — 2018"
+      }
+    ]
+  },
+  "footer": {
+    "copyright": "© {year} AI 创艺工坊. 保留所有权利。",
+    "tagline": "用AI讲述故事，用创意连接世界",
+    "poweredBy": "由 Next.js 与 AI 驱动"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "出错了",
+    "errorHint": "请稍后再试，或联系网站管理员",
+    "retry": "重试",
+    "comingSoon": "即将推出",
+    "comingSoonHint": "此功能正在开发中，敬请期待",
+    "notFound": "页面未找到",
+    "notFoundDesc": "您访问的页面不存在或已被移除",
+    "backToHome": "返回首页",
+    "close": "关闭",
+    "menu": "菜单",
+    "languageSwitch": "切换语言",
+    "darkMode": "深色模式",
+    "lightMode": "浅色模式",
+    "copySuccess": "已复制",
+    "share": "分享",
+    "copyLink": "复制链接"
+  }
+}

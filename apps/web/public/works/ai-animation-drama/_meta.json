@@ -1,0 +1,12 @@
+[
+  {
+    "title": "样例作品 - AI 漫剧 1",
+    "description": "一段使用AI技术制作的古风动画漫剧片段，融合水墨风格与动态叙事。",
+    "tools": ["ComfyUI", "Runway Gen-3", "Sora"],
+    "tags": ["古风", "动画", "叙事"],
+    "duration": "02:30",
+    "createdAt": "2025-03",
+    "featured": true,
+    "file": ""
+  }
+]
