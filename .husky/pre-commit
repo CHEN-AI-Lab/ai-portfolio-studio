@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# pre-commit hook — 提交前运行结构合规检查 + 单元测试
+echo "=== pre-commit: 多端结构合规检查 ==="
+bash scripts/check-structure.sh
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ 结构违规，提交被阻止。修复后重试。"
+  echo "   运行 scripts/check-structure.sh 查看具体问题"
+  exit 1
+fi
+
+echo ""
+echo "=== pre-commit: 单元测试 ==="
+npx vitest run
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ 测试失败，提交被阻止。修复后重试。"
+  echo "   运行 pnpm test 查看具体失败"
+  exit 1
+fi
+
+echo ""
+echo "✅ pre-commit 全部通过"

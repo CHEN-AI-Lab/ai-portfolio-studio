@@ -15,4 +15,3 @@ works/_inbox/
 
 # Build cache (too big and ephemeral for git)
 .turbo/
-.husky/
