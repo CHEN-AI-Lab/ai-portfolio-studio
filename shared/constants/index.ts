@@ -129,7 +129,7 @@ export const SITE_CONFIG = {
     zh: '探索AI与艺术的边界 — 展示AI漫剧、真人短剧、概念预告片及创意视觉作品的个人作品集',
     en: 'Exploring the frontier of AI and art — a personal portfolio showcasing AI animation dramas, live-action shorts, concept trailers, and creative visuals',
   },
-  url: 'https://ai-creative-studio.vercel.app',
+  url: 'https://ai-portfolio-studio-nu.vercel.app',
   locale: 'zh-CN',
   locales: ['zh-CN', 'en'] as const,
   defaultLocale: 'zh-CN' as const,
@@ -145,7 +145,7 @@ export const DEFAULT_SOCIAL_LINKS: SocialLink[] = [
   },
   {
     platform: 'Bilibili',
-    url: 'https://space.bilibili.com/your-id',
+    url: 'https://space.bilibili.com/',
     icon: 'bilibili',
   },
   {

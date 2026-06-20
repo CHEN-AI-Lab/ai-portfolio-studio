@@ -23,6 +23,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'i0.hdslb.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'djwwsekihbbwdnivimbf.supabase.co',
+      },
     ],
   },
   async redirects() {

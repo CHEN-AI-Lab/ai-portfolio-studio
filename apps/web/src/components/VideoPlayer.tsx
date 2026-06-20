@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef, useState, useCallback, useEffect } from 'react'
+import React, { useRef, useState, useCallback, useEffect } from 'react'
+import { useLocale } from 'next-intl'
 
 interface VideoPlayerProps {
   src: string
@@ -15,6 +16,7 @@ export function VideoPlayer({ src, poster, className }: VideoPlayerProps) {
   const [hasError, setHasError] = useState(false)
   const [posterFailed, setPosterFailed] = useState(false)
   const [aspectRatio, setAspectRatio] = useState<string | number>('16 / 9')
+  const locale = useLocale()
   // Track whether we've detected the aspect ratio (avoid repeat setState)
   const ratioSetRef = useRef(false)
   // Track whether video has ever started playing (hide poster after first play)
@@ -102,12 +104,14 @@ export function VideoPlayer({ src, poster, className }: VideoPlayerProps) {
             }}
           >
             <span style={{ fontSize: '32px', marginBottom: '8px' }}>⚠️</span>
-            <span>Video failed to load</span>
+            <span>{locale === 'zh-CN' ? '视频加载失败' : 'Video failed to load'}</span>
+            <span style={{ marginTop: '4px', fontSize: '12px', opacity: 0.7 }}>{locale === 'zh-CN' ? '视频文件未找到，暂时无法播放' : 'Video file not found'}</span>
           </div>
         )}
 
         {/* Poster — only show before any playback */}
         {poster && !isPlaying && !posterFailed && !hasPlayedRef.current && (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={poster}
             alt=""

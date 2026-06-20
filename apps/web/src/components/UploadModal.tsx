@@ -86,6 +86,8 @@ export function UploadModal({ open, onClose, onSuccess, onNotify }: UploadModalP
   const [preview, setPreview] = useState('');
   const [autoMode, setAutoMode] = useState(false);
   const [bilibiliUrl, setBilibiliUrl] = useState('');
+  const [uploadKey, setUploadKey] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -139,7 +141,14 @@ export function UploadModal({ open, onClose, onSuccess, onNotify }: UploadModalP
     setUploading(false);
     setAutoMode(false);
     setBilibiliUrl('');
+    setUploadKey('');
+    setShowPwd(false);
   }, []);
+
+  const handleClose = useCallback(() => {
+    reset();
+    onClose();
+  }, [reset, onClose]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,7 +156,12 @@ export function UploadModal({ open, onClose, onSuccess, onNotify }: UploadModalP
     const bvid = extractBvid(bilibiliUrl);
 
     if (!file && !bvid) {
-      setError(locale === 'zh-CN' ? '请选择文件或填写 B站链接' : 'Select a file or provide a Bilibili link');
+      setError(locale === 'zh-CN' ? '请选择图片或填写 B站链接' : 'Select an image or provide a Bilibili link');
+      return;
+    }
+
+    if (!uploadKey) {
+      setError(locale === 'zh-CN' ? '请输入上传密码' : 'Please enter upload key');
       return;
     }
 
@@ -181,6 +195,7 @@ export function UploadModal({ open, onClose, onSuccess, onNotify }: UploadModalP
       formData.append('tags', tags);
       formData.append('description', description.trim());
       if (bvid) formData.append('bvid', bvid);
+      formData.append('upload_key', uploadKey);
 
       const res = await fetch('/api/works/upload', { method: 'POST', body: formData });
       const data = await res.json();
@@ -201,7 +216,7 @@ export function UploadModal({ open, onClose, onSuccess, onNotify }: UploadModalP
     } finally {
       setUploading(false);
     }
-  }, [file, title, category, tags, description, bilibiliUrl, locale, reset, onSuccess, onNotify]);
+  }, [file, title, category, tags, description, bilibiliUrl, uploadKey, locale, reset, onSuccess, onNotify]);
 
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose();
@@ -219,7 +234,7 @@ export function UploadModal({ open, onClose, onSuccess, onNotify }: UploadModalP
           <button
             type="button"
             className="upload-modal-close"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label={locale === 'zh-CN' ? '关闭' : 'Close'}
           >
             ✕
@@ -230,8 +245,7 @@ export function UploadModal({ open, onClose, onSuccess, onNotify }: UploadModalP
           {/* File input */}
           <div className="upload-modal-field">
             <label className="upload-modal-label">
-              {locale === 'zh-CN' ? '选择文件' : 'Select File'}
-              <span className="upload-modal-required">*</span>
+              {locale === 'zh-CN' ? '上传图片' : 'Upload Image'}
             </label>
             <div
               className="upload-modal-dropzone"
@@ -240,20 +254,14 @@ export function UploadModal({ open, onClose, onSuccess, onNotify }: UploadModalP
               onDrop={handleDrop}
             >
               {preview ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={preview} alt="Preview" className="upload-modal-preview" />
               ) : file ? (
                 <p className="upload-modal-file-name">{file.name} ({(file.size / 1024 / 1024).toFixed(1)} MB)</p>
               ) : (
                 <div className="upload-modal-dropzone-text">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
-                  </svg>
-                  <p>{locale === 'zh-CN' ? '点击或拖拽文件到此处' : 'Click or drag file here'}</p>
-                  <p className="upload-modal-hint">
-                    {locale === 'zh-CN' ? '支持 JPG, PNG, WebP, GIF, MP4, WebM (最大 200MB)' : 'Supports JPG, PNG, WebP, GIF, MP4, WebM (max 200MB)'}
-                  </p>
+                  <p style={{ margin: 0, fontSize: '0.85rem' }}>{locale === 'zh-CN' ? '点击选择图片' : 'Click to select an image'}</p>
+                  <p className="upload-modal-hint">{locale === 'zh-CN' ? 'JPG / PNG / WebP / GIF' : 'JPG / PNG / WebP / GIF'}</p>
                 </div>
               )}
               <input
@@ -343,15 +351,15 @@ export function UploadModal({ open, onClose, onSuccess, onNotify }: UploadModalP
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={locale === 'zh-CN' ? '简短描述这个作品...' : 'A short description of the work...'}
-              rows={3}
+              rows={2}
               maxLength={500}
             />
           </div>
 
           {/* B站链接 — 可选 */}
           <div className="upload-modal-field">
-            <label className="upload-modal-label">
-              {locale === 'zh-CN' ? 'B站视频链接（可选）' : 'Bilibili Video Link (optional)'}
+            <label className="upload-modal-label" style={{ color: '#A78BFA' }}>
+              {locale === 'zh-CN' ? '▶ 上传视频（B站链接）' : '▶ Upload Video (Bilibili Link)'}
             </label>
             <input
               type="url"
@@ -383,12 +391,23 @@ export function UploadModal({ open, onClose, onSuccess, onNotify }: UploadModalP
           {/* Error */}
           {error && <p className="upload-modal-error">{error}</p>}
 
+          <div className="upload-modal-field" style={{ position: 'relative' }}>
+            <input type={showPwd ? 'text' : 'password'} className="upload-modal-input" value={uploadKey}
+              onChange={(e) => setUploadKey(e.target.value)}
+              placeholder={locale === 'zh-CN' ? '上传密码' : 'Upload key'}
+              style={{ fontSize: '0.8rem', padding: '8px 34px 8px 10px', width: '100%' }} />
+            <span onClick={() => setShowPwd(!showPwd)}
+              style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: '#888', fontSize: '0.85rem', userSelect: 'none' }}>
+              {showPwd ? '🙈' : '👁'}
+            </span>
+          </div>
+
           {/* Actions */}
           <div className="upload-modal-actions">
             <button
               type="button"
               className="upload-modal-btn upload-modal-btn--cancel"
-              onClick={onClose}
+              onClick={handleClose}
               disabled={uploading}
             >
               {locale === 'zh-CN' ? '取消' : 'Cancel'}

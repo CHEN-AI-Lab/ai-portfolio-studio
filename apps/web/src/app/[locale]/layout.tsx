@@ -6,6 +6,7 @@ import {NavBar} from '@/components/NavBar';
 import {Footer} from '@/components/Footer';
 import {ScrollToTop} from '@/components/ScrollToTop';
 import ScrollReveal from '@/components/ScrollReveal';
+import {ErrorBoundary} from '@/components/ErrorBoundary';
 import '@/styles/globals.scss';
 
 export const metadata: Metadata = {
@@ -60,7 +61,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <NavBar />
-          <main id="main-content" className="page-transition">{children}</main>
+          <ErrorBoundary locale={locale}>
+            <main id="main-content" className="page-transition">{children}</main>
+          </ErrorBoundary>
           <Footer />
           <ScrollToTop />
           <ScrollReveal />

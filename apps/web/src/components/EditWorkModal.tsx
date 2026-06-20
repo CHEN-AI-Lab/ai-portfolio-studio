@@ -63,7 +63,7 @@ export function EditWorkModal({ work, onClose, onSaved, onNotify }: EditWorkModa
     } finally {
       setSaving(false);
     }
-  }, [work.id, title, tags, description, locale, onSaved]);
+  }, [work.id, title, tags, description, bvid, onNotify, locale, onSaved]);
 
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose();
@@ -92,7 +92,7 @@ export function EditWorkModal({ work, onClose, onSaved, onNotify }: EditWorkModa
     } finally {
       setDeleting(false);
     }
-  }, [work.id, locale, onSaved]);
+  }, [work.id, onNotify, locale, onSaved]);
 
   return (
     <div className="edit-modal__overlay" onClick={handleOverlayClick}>

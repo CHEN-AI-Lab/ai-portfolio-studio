@@ -1,6 +1,6 @@
 import { writeFile, mkdir, readFile, access, unlink } from 'node:fs/promises';
 import * as path from 'node:path';
-import type { WorkItem, WorkCategory } from 'shared';
+import type { WorkItem, WorkCategory } from 'shared/types';
 import {
   uploadFileToQiniu,
   deleteFileFromQiniu,

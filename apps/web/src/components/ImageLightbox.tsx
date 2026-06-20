@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 
 interface LightboxImage {
   src: string
@@ -97,11 +98,14 @@ export function ImageLightbox({ images, initialIndex = 0, onClose }: ImageLightb
       )}
 
       {/* Image */}
-      <div className="lightbox-content">
-        <img
+      <div className="lightbox-content" style={{ width: '90vw', height: '90vh' }}>
+        <Image
           src={currentImage.src}
           alt={currentImage.alt}
+          fill
           draggable={false}
+          sizes="90vw"
+          style={{ objectFit: 'contain' }}
         />
       </div>
 

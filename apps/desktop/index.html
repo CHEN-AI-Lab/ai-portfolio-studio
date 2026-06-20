@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Portfolio Studio</title>
+  <link rel="stylesheet" href="src/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Navigation -->
+    <nav id="navbar">
+      <div class="nav-inner">
+        <a href="#/" class="nav-brand" id="nav-brand">AI Creative Studio</a>
+        <div class="nav-links">
+          <a href="#/" class="nav-link" data-route="home">Home</a>
+          <a href="#/works" class="nav-link" data-route="works">Works</a>
+          <a href="#/about" class="nav-link" data-route="about">About</a>
+        </div>
+        <button id="lang-toggle" class="lang-toggle" title="Switch Language">EN</button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="main-content">
+      <!-- Home Page -->
+      <section id="page-home" class="page active">
+        <div class="hero">
+          <h1 class="hero-title" id="hero-title">AI Creative Studio</h1>
+          <p class="hero-subtitle" id="hero-subtitle">Exploring the frontier of AI and art</p>
+          <div class="hero-stats" id="hero-stats">
+            <span class="stat-item"><strong id="works-count">0</strong> works</span>
+          </div>
+        </div>
+        <div class="category-grid" id="category-grid">
+          <!-- Category cards rendered by JS -->
+        </div>
+        <div class="section-header">
+          <h2 id="latest-works-title">Latest Works</h2>
+        </div>
+        <div class="works-grid" id="home-works-grid">
+          <!-- Works rendered by JS -->
+        </div>
+      </section>
+
+      <!-- Works Page -->
+      <section id="page-works" class="page">
+        <div class="page-header">
+          <h1 id="works-page-title">All Works</h1>
+          <div class="filter-bar">
+            <div class="category-filters" id="category-filters">
+              <button class="filter-chip active" data-category="">All</button>
+            </div>
+          </div>
+        </div>
+        <div class="works-grid" id="works-grid">
+          <!-- Works rendered by JS -->
+        </div>
+        <div class="loading-indicator" id="works-loading" style="display:none;">Loading...</div>
+        <div class="error-message" id="works-error" style="display:none;">
+          <p>Failed to load works.</p>
+          <button id="works-retry" class="btn btn-accent">Retry</button>
+        </div>
+      </section>
+
+      <!-- Work Detail Page -->
+      <section id="page-work-detail" class="page">
+        <button id="detail-back" class="btn btn-ghost back-btn">&larr; Back</button>
+        <div id="work-detail-content">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- About Page -->
+      <section id="page-about" class="page">
+        <div class="about-container">
+          <h1 id="about-title">About</h1>
+          <div class="about-avatar">
+            <div class="avatar-placeholder">AI</div>
+          </div>
+          <div class="about-bio" id="about-bio">
+            <!-- Bio rendered by JS -->
+          </div>
+          <div class="about-section">
+            <h2 id="skills-title">Skills</h2>
+            <div class="skills-grid" id="skills-grid">
+              <!-- Skills rendered by JS -->
+            </div>
+          </div>
+          <div class="about-section">
+            <h2 id="tools-title">Tools</h2>
+            <div class="tools-list" id="tools-list">
+              <!-- Tools rendered by JS -->
+            </div>
+          </div>
+          <div class="about-section">
+            <h2 id="follow-title">Follow Me</h2>
+            <div class="social-links" id="social-links">
+              <!-- Social links rendered by JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer">
+      <p id="footer-text">&copy; 2025 AI Creative Studio. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script type="module" src="src/i18n.ts"></script>
+  <script type="module" src="src/main.ts"></script>
+</body>
+</html>

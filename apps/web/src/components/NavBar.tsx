@@ -64,6 +64,7 @@ export function NavBar() {
     { href: '/works', label: t('works') },
     { href: '/about', label: t('about') },
     { href: '/resume', label: t('resume') },
+    { href: '/admin', label: t('admin') ?? 'Admin' },
   ];
 
   return (

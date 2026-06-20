@@ -1,0 +1,305 @@
+<template>
+  <div class="page home-page">
+    <!-- Header with locale toggle -->
+    <div class="page-header">
+      <div>
+        <text class="page-title">{{ heroTitle }}</text>
+        <text class="page-subtitle">{{ heroSubtitle }}</text>
+      </div>
+      <div class="locale-toggle" @click="toggleLocale">
+        <text class="locale-btn {{ locale === 'zh-CN' ? 'active' : '' }}">中文</text>
+        <text class="locale-btn {{ locale === 'en' ? 'active' : '' }}">EN</text>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-row" if="{{ stats }}">
+      <div class="stat-badge">
+        <text class="stat-value">{{ stats.totalWorks }}</text>
+        <text class="stat-label">{{ t('common.stats') }}</text>
+      </div>
+      <div class="stat-badge">
+        <text class="stat-value">{{ stats.totalVideos }}</text>
+        <text class="stat-label">{{ t('work.video') }}</text>
+      </div>
+      <div class="stat-badge">
+        <text class="stat-value">{{ stats.totalImages }}</text>
+        <text class="stat-label">{{ t('work.image') }}</text>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-spinner" if="{{ loading }}">
+      <text>{{ t('common.loading') }}</text>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-state" if="{{ error }}">
+      <text class="error-state-icon">⚠️</text>
+      <text class="error-state-text">{{ t('common.error') }}</text>
+      <text class="error-state-hint">{{ errorMessage }}</text>
+      <button class="retry-btn" @click="loadData">{{ t('common.retry') }}</button>
+    </div>
+
+    <!-- Category Grid -->
+    <div if="{{ !loading && !error }}">
+      <text class="section-title">{{ t('work.all') }}</text>
+      <div class="category-grid">
+        <div
+          class="category-card"
+          for="{{ category in categories }}"
+          @click="goToCategory(category.id)"
+        >
+          <text class="category-icon">{{ categoryIcon(category.id) }}</text>
+          <text class="category-name">{{ categoryLabel(category.id) }}</text>
+          <text class="category-count">{{ category.workCount || 0 }} {{ t('work.all') }}</text>
+        </div>
+      </div>
+    </div>
+
+    <!-- Featured / Recent Works -->
+    <div if="{{ recentWorks.length > 0 }}">
+      <text class="section-title">{{ locale === 'zh-CN' ? '最新作品' : 'Recent Works' }}</text>
+      <div class="works-grid">
+        <div
+          class="work-card"
+          for="{{ work in recentWorks }}"
+          @click="goToDetail(work.id)"
+        >
+          <div class="work-thumb">
+            <text if="{{ !work.thumbnail }}">{{ categoryIcon(work.category) }}</text>
+            <image
+              if="{{ work.thumbnail }}"
+              class="work-thumb-img"
+              src="{{ work.thumbnail }}"
+              alt="{{ work.title }}"
+            />
+          </div>
+          <div class="work-meta">
+            <text class="work-title">{{ work.title }}</text>
+            <text class="work-category-tag">{{ categoryLabel(work.category) }}</text>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Tagline -->
+    <div class="footer-section">
+      <text class="footer-tagline">{{ t('footer.tagline') }}</text>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="nav-bar">
+      <div class="nav-item active">
+        <text class="nav-item-icon">🏠</text>
+        <text class="nav-item-label">{{ t('nav.home') }}</text>
+      </div>
+      <div class="nav-item" @click="goToWorks">
+        <text class="nav-item-icon">🎨</text>
+        <text class="nav-item-label">{{ t('nav.works') }}</text>
+      </div>
+      <div class="nav-item" @click="goToAbout">
+        <text class="nav-item-icon">👤</text>
+        <text class="nav-item-label">{{ t('nav.about') }}</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  @import '../app.css';
+
+  .home-page {
+    padding-bottom: 80px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    margin-top: 8px;
+  }
+
+  .footer-section {
+    text-align: center;
+    padding: 32px 16px;
+    margin-top: 16px;
+  }
+
+  .footer-tagline {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+</style>
+
+<script>
+  import { t, getLocale, setLocale, getCategoryIcon } from '../i18n';
+  import { fetchWorks } from '../api';
+  import { navigateTo, ROUTES } from '../../router';
+
+  export default {
+    data: {
+      locale: 'zh-CN',
+      heroTitle: 'AI 创艺工坊',
+      heroSubtitle: '探索人工智能与视觉艺术的无限可能',
+      loading: true,
+      error: false,
+      errorMessage: '',
+      stats: null,
+      categories: [],
+      recentWorks: [],
+      allWorks: [],
+    },
+
+    onInit() {
+      this.loadData();
+      this._syncLocale();
+    },
+
+    /**
+     * Listen for locale broadcast from app.js
+     */
+    onShow() {
+      this._syncLocale();
+    },
+
+    /**
+     * Handle locale change broadcast
+     */
+    onMessage(event) {
+      if (event && event.type === 'locale-changed') {
+        this.locale = event.data.locale;
+        this._updateTexts();
+      }
+    },
+
+    /**
+     * Load all required data
+     */
+    loadData() {
+      const self = this;
+      self.loading = true;
+      self.error = false;
+
+      fetchWorks()
+        .then(function (works) {
+          self.allWorks = works;
+          self._processWorks(works);
+          self.loading = false;
+        })
+        .catch(function (err) {
+          self.loading = false;
+          self.error = true;
+          self.errorMessage = err.message || 'Network error';
+        });
+    },
+
+    /**
+     * Process works into stats, categories, and recent items
+     */
+    _processWorks(works) {
+      // Stats
+      const videos = works.filter((w) => w.type === 'video').length;
+      const images = works.filter((w) => w.type === 'image').length;
+      this.stats = {
+        totalWorks: works.length,
+        totalVideos: videos,
+        totalImages: images,
+      };
+
+      // Category aggregation
+      const catMap = {};
+      works.forEach(function (w) {
+        catMap[w.category] = (catMap[w.category] || 0) + 1;
+      });
+      this.categories = Object.keys(catMap).map(function (id) {
+        return { id: id, workCount: catMap[id] };
+      });
+
+      // Recent works (latest 6)
+      this.recentWorks = works.slice(0, 6);
+    },
+
+    /**
+     * Navigate to Works page filtered by category
+     */
+    goToCategory(categoryId) {
+      navigateTo('Works', { category: categoryId });
+    },
+
+    /**
+     * Navigate to a specific work detail
+     */
+    goToDetail(workId) {
+      navigateTo('WorkDetail', { id: workId });
+    },
+
+    /**
+     * Navigate to Works page
+     */
+    goToWorks() {
+      navigateTo('Works');
+    },
+
+    /**
+     * Navigate to About page
+     */
+    goToAbout() {
+      navigateTo('About');
+    },
+
+    /**
+     * Toggle locale between zh-CN and en
+     */
+    toggleLocale() {
+      const newLocale = this.locale === 'zh-CN' ? 'en' : 'zh-CN';
+      this.locale = newLocale;
+      setLocale(newLocale);
+      this._updateTexts();
+      // Notify app
+      const app = this.$app || require('@system.app');
+      if (app && app.switchLocale) {
+        app.switchLocale(newLocale);
+      }
+    },
+
+    /**
+     * Sync locale from app/i18n state
+     */
+    _syncLocale() {
+      this.locale = getLocale();
+      this._updateTexts();
+    },
+
+    /**
+     * Update localized UI strings
+     */
+    _updateTexts() {
+      this.heroTitle = t('hero.title');
+      this.heroSubtitle = t('hero.subtitle');
+    },
+
+    /**
+     * Get category label for current locale
+     */
+    categoryLabel(id) {
+      return t('categories.' + id + '.label');
+    },
+
+    /**
+     * Get category icon
+     */
+    categoryIcon(id) {
+      return getCategoryIcon(id);
+    },
+
+    /**
+     * Translation helper for data bindings
+     */
+    t(key) {
+      return t(key);
+    },
+  };
+</script>

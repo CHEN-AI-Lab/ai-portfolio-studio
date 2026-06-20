@@ -1,117 +1,106 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { detectType, generateId, generateTitle, generateTags, generateDescription, autoDetectCategory, readManifest, writeManifest, validateFile, validateTypeCategoryMatch, saveFile } from '../upload-utils';
-import type { WorkItem, WorkCategory } from 'shared';
+import { NextRequest, NextResponse } from 'next/server'
+import { createWork, uploadImage } from 'shared/api/supabase'
 
-// ─── POST: Upload a new work ───────────────────────────────────────
-// Title and category are optional — if omitted, auto-detect from filename.
-// B站 BV number (bvid) is optional — when provided, video plays via B站 embed.
+// ─── Helper: extract keywords for tags from text ────────────────
+
+function extractTags(text: string): string[] {
+  const cjk = text.match(/[\u4e00-\u9fff]{2,6}/g) || []
+  const en = text.match(/[a-zA-Z]{3,12}/g) || []
+  const combined = [...cjk, ...en.map(w => w.toLowerCase())]
+  const stopWords = ['the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had', 'her', 'was', 'one', 'our', 'out', 'has', 'have', 'been', 'some', 'them', 'than', 'that', 'this', 'very', 'just', 'with', 'from', 'they', 'what', 'when', 'what', 'which', 'their', 'about', 'would', 'could', 'should', 'after', 'before']
+  return [...new Set(combined)].filter(w => w.length >= 2 && !stopWords.includes(w)).slice(0, 8)
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
+    const formData = await request.formData()
+    const file = formData.get('file') as File | null
+    const titleRaw = (formData.get('title') as string)?.trim()
+    const categoryRaw = (formData.get('category') as string)?.trim()
+    const tagsRaw = (formData.get('tags') as string)?.trim() || ''
+    const descriptionRaw = (formData.get('description') as string)?.trim() || ''
+    const bvid = (formData.get('bvid') as string)?.trim() || ''
+    const uploadKey = formData.get('upload_key') as string
 
-    const file = formData.get('file') as File | null;
-    const titleRaw = (formData.get('title') as string)?.trim();
-    const categoryRaw = (formData.get('category') as string)?.trim();
-    const tagsRaw = (formData.get('tags') as string)?.trim() || '';
-    const descriptionRaw = (formData.get('description') as string)?.trim() || '';
-    const bvid = (formData.get('bvid') as string)?.trim() || '';
+    // Simple upload protection
+    const expectedKey = process.env.UPLOAD_SECRET || ''
+    if (uploadKey !== expectedKey) {
+      return NextResponse.json({ success: false, error: '上传密钥错误' }, { status: 403 })
+    }
 
-    // At least file OR bvid is required
     if (!file && !bvid) {
-      return NextResponse.json({ success: false, error: '请选择文件或填写 B站链接' }, { status: 400 });
+      return NextResponse.json({ success: false, error: '请选择文件或填写 B站链接' }, { status: 400 })
     }
 
-    // Validate file if present
-    if (file) {
-      const validationError = validateFile(file.name, file.size);
-      if (validationError) {
-        return NextResponse.json({ success: false, error: validationError }, { status: 400 });
-      }
-    }
-
-    // Validate BV number format
     if (bvid && !/^BV[a-zA-Z0-9]{10,12}$/i.test(bvid)) {
-      return NextResponse.json({ success: false, error: 'BV 号格式不正确' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'BV 号格式不正确' }, { status: 400 })
     }
 
-    // Auto-detect when not provided
-    const category = categoryRaw || (file ? autoDetectCategory(file.name) : 'ai-creative-short');
-    let title = titleRaw || (file ? generateTitle(file.name) : '');
-    let description = descriptionRaw || (file ? generateDescription(file.name, category) : '');
+    const category = categoryRaw || (file ? 'ai-creative-short' : 'ai-creative-short')
+    let imageUrl = ''
+    let thumbnail = ''
+    let type: 'video' | 'image' = bvid ? 'video' : 'video'
+    let title = titleRaw || ''
+    let description = descriptionRaw || ''
+    let autoTags: string[] = []
 
-    // Validate: file type must match category (only when file present)
+    // Upload file to Supabase Storage
     if (file) {
-      const typeMatchError = validateTypeCategoryMatch(detectType(file.name), category);
-      if (typeMatchError) {
-        return NextResponse.json({ success: false, error: typeMatchError }, { status: 400 });
+      const ext = file.name.split('.').pop()?.toLowerCase() || ''
+      type = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'].includes(ext) ? 'image' : 'video'
+      try {
+        imageUrl = await uploadImage(file)
+        thumbnail = type === 'image' ? imageUrl : ''
+      } catch (uploadErr: any) {
+        console.error('[Upload] Image upload failed:', uploadErr)
+        return NextResponse.json(
+          { success: false, error: '图片上传失败: ' + (uploadErr?.message || '') },
+          { status: 500 }
+        )
       }
     }
 
-    // Save file or use B站 cover
-    let publicUrl = '';
-    let thumbnailUrl = '';
-
-    if (file) {
-      publicUrl = await saveFile(file, category);
-      thumbnailUrl = detectType(file.name) === 'image' ? publicUrl : '';
-    }
-
-    // If bvid is provided and no thumbnail, try to fetch cover from B站
-    if (bvid && !thumbnailUrl) {
+    // Fetch B站 data for auto-fill
+    if (bvid) {
       try {
         const biliRes = await fetch(
           `https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`,
-          {
-            headers: {
-              'User-Agent': 'Mozilla/5.0',
-              'Referer': 'https://www.bilibili.com',
-            },
-          },
-        );
-        const biliJson = await biliRes.json();
+          { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.bilibili.com' } }
+        )
+        const biliJson = await biliRes.json()
         if (biliJson.code === 0 && biliJson.data) {
-          thumbnailUrl = biliJson.data.pic || '';
-          // Auto-fill title and description from B站
-          if (!title) title = biliJson.data.title || title;
-          if (!description) description = (biliJson.data.desc || '').slice(0, 500);
+          const data = biliJson.data
+          thumbnail = (data.pic || '').replace('http://', 'https://')
+          if (!title) title = data.title || title
+          if (!description) description = (data.desc || '').slice(0, 500)
+          // Auto-generate tags from B站 data
+          if (data.tname) autoTags.push(data.tname)
+          if (data.title) autoTags.push(...extractTags(data.title))
+          if (data.desc) autoTags.push(...extractTags(data.desc))
+          autoTags = [...new Set(autoTags)].filter(Boolean).slice(0, 8)
         }
-      } catch {
-        // Non-critical — continue without cover
-      }
+      } catch {}
     }
 
-    // Parse or auto-generate tags
     const tags = tagsRaw
       ? tagsRaw.split(/[,，、\s]+/).map((t) => t.trim()).filter(Boolean)
-      : file ? generateTags(file.name) : [];
+      : autoTags
 
-    const type: 'video' | 'image' = bvid ? 'video' : (file ? detectType(file.name) : 'video');
-
-    const workItem: WorkItem = {
-      id: generateId(),
-      title,
+    const work = await createWork({
+      title: title || (bvid ? 'B站视频' : '未命名作品'),
       description,
-      category: category as WorkCategory,
+      category,
       type,
-      thumbnail: thumbnailUrl,
-      mediaUrl: publicUrl,
+      bvid: bvid || null,
+      image_url: imageUrl || null,
+      thumbnail,
       tags,
-      createdAt: new Date().toISOString().split('T')[0] || '',
-      featured: false,
-      ...(bvid ? { bvid } : {}),
-    };
+    })
 
-    const manifest = await readManifest();
-    manifest.works.unshift(workItem);
-    await writeManifest(manifest);
-
-    return NextResponse.json({ success: true, work: workItem });
-  } catch (error) {
-    console.error('[Upload] Error:', error);
-    return NextResponse.json(
-      { success: false, error: '上传失败，请稍后重试' },
-      { status: 500 },
-    );
+    return NextResponse.json({ success: true, work })
+  } catch (error: any) {
+    console.error('[Upload] Error:', error)
+    const msg = error?.message || error?.toString?.() || '上传失败，请稍后重试'
+    return NextResponse.json({ success: false, error: msg }, { status: 500 })
   }
 }

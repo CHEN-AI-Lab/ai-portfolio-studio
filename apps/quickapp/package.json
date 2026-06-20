@@ -1,0 +1,13 @@
+{
+  "name": "ai-portfolio-quickapp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Creative Studio - Quick App client for Android",
+  "package": "com.aicreativestudio.portfolio",
+  "scripts": {
+    "build": "echo 'QuickApp requires hap-toolkit (not installed in this env)'",
+    "dev": "echo 'QuickApp requires hap-toolkit'"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

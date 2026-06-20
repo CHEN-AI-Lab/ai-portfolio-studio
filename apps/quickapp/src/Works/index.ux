@@ -1,0 +1,293 @@
+<template>
+  <div class="page works-page">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <text class="page-title">{{ t('work.all') }}</text>
+        <text class="page-subtitle">{{ worksCountText }}</text>
+      </div>
+      <div class="locale-toggle" @click="toggleLocale">
+        <text class="locale-btn {{ locale === 'zh-CN' ? 'active' : '' }}">中文</text>
+        <text class="locale-btn {{ locale === 'en' ? 'active' : '' }}">EN</text>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div
+        class="filter-chip {{ activeCategory === 'all' ? 'active' : '' }}"
+        @click="filterByCategory('all')"
+      >
+        <text>{{ t('work.all') }}</text>
+      </div>
+      <div
+        class="filter-chip {{ activeCategory === cat.id ? 'active' : '' }}"
+        for="{{ cat in categories }}"
+        @click="filterByCategory(cat.id)"
+      >
+        <text>{{ categoryLabel(cat.id) }}</text>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-spinner" if="{{ loading }}">
+      <text>{{ t('common.loading') }}</text>
+    </div>
+
+    <!-- Error -->
+    <div class="error-state" if="{{ error }}">
+      <text class="error-state-icon">⚠️</text>
+      <text class="error-state-text">{{ t('common.error') }}</text>
+      <button class="retry-btn" @click="loadData">{{ t('common.retry') }}</button>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" if="{{ !loading && !error && filteredWorks.length === 0 }}">
+      <text class="empty-state-icon">🔍</text>
+      <text class="empty-state-text">{{ t('work.noResults') }}</text>
+    </div>
+
+    <!-- Works Grid -->
+    <div class="works-grid" if="{{ filteredWorks.length > 0 }}">
+      <div
+        class="work-card"
+        for="{{ work in filteredWorks }}"
+        @click="goToDetail(work.id)"
+      >
+        <div class="work-thumb">
+          <text if="{{ !work.thumbnail }}">{{ categoryIcon(work.category) }}</text>
+          <image
+            if="{{ work.thumbnail }}"
+            class="work-thumb-img"
+            src="{{ work.thumbnail }}"
+            alt="{{ work.title }}"
+          />
+        </div>
+        <div class="work-meta">
+          <text class="work-title">{{ work.title }}</text>
+          <text class="work-category-tag">{{ categoryLabel(work.category) }}</text>
+          <text if="{{ work.duration }}" class="work-duration">
+            ⏱ {{ formatDuration(work.duration) }}
+          </text>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="nav-bar">
+      <div class="nav-item" @click="goToHome">
+        <text class="nav-item-icon">🏠</text>
+        <text class="nav-item-label">{{ t('nav.home') }}</text>
+      </div>
+      <div class="nav-item active">
+        <text class="nav-item-icon">🎨</text>
+        <text class="nav-item-label">{{ t('nav.works') }}</text>
+      </div>
+      <div class="nav-item" @click="goToAbout">
+        <text class="nav-item-icon">👤</text>
+        <text class="nav-item-label">{{ t('nav.about') }}</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  @import '../app.css';
+
+  .works-page {
+    padding-bottom: 80px;
+  }
+
+  .work-duration {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+</style>
+
+<script>
+  import { t, getLocale, setLocale, getCategoryIcon } from '../i18n';
+  import { fetchWorks } from '../api';
+  import { navigateTo, ROUTES } from '../../router';
+
+  export default {
+    data: {
+      locale: 'zh-CN',
+      loading: true,
+      error: false,
+      allWorks: [],
+      filteredWorks: [],
+      categories: [],
+      activeCategory: 'all',
+      worksCountText: '',
+    },
+
+    onInit() {
+      this._syncLocale();
+
+      // Check for category filter from route params
+      const router = require('@system.router');
+      const params = router ? router.getParams() : {};
+      if (params && params.category) {
+        this.activeCategory = params.category;
+      }
+
+      this.loadData();
+    },
+
+    onShow() {
+      this._syncLocale();
+    },
+
+    onMessage(event) {
+      if (event && event.type === 'locale-changed') {
+        this.locale = event.data.locale;
+        this._updateTexts();
+      }
+    },
+
+    /**
+     * Fetch works from API
+     */
+    loadData() {
+      const self = this;
+      self.loading = true;
+      self.error = false;
+
+      fetchWorks()
+        .then(function (works) {
+          self.allWorks = works;
+          self._buildCategories(works);
+          self._applyFilter();
+          self.loading = false;
+        })
+        .catch(function (err) {
+          self.loading = false;
+          self.error = true;
+        });
+    },
+
+    /**
+     * Extract unique categories from works
+     */
+    _buildCategories(works) {
+      const seen = {};
+      const cats = [];
+      works.forEach(function (w) {
+        if (!seen[w.category]) {
+          seen[w.category] = true;
+          cats.push({ id: w.category });
+        }
+      });
+      this.categories = cats;
+    },
+
+    /**
+     * Apply the active category filter
+     */
+    _applyFilter() {
+      if (this.activeCategory === 'all') {
+        this.filteredWorks = this.allWorks;
+      } else {
+        const cat = this.activeCategory;
+        this.filteredWorks = this.allWorks.filter(function (w) {
+          return w.category === cat;
+        });
+      }
+      this._updateTexts();
+    },
+
+    /**
+     * Filter by category
+     */
+    filterByCategory(categoryId) {
+      this.activeCategory = categoryId;
+      this._applyFilter();
+    },
+
+    /**
+     * Navigate to work detail
+     */
+    goToDetail(workId) {
+      navigateTo('WorkDetail', { id: workId });
+    },
+
+    /**
+     * Navigate home
+     */
+    goToHome() {
+      navigateTo('Home');
+    },
+
+    /**
+     * Navigate about
+     */
+    goToAbout() {
+      navigateTo('About');
+    },
+
+    /**
+     * Toggle locale
+     */
+    toggleLocale() {
+      const newLocale = this.locale === 'zh-CN' ? 'en' : 'zh-CN';
+      this.locale = newLocale;
+      setLocale(newLocale);
+      this._updateTexts();
+      const app = this.$app || require('@system.app');
+      if (app && app.switchLocale) {
+        app.switchLocale(newLocale);
+      }
+    },
+
+    /**
+     * Sync locale
+     */
+    _syncLocale() {
+      this.locale = getLocale();
+      this._updateTexts();
+    },
+
+    /**
+     * Update localized strings
+     */
+    _updateTexts() {
+      const count = this.filteredWorks.length;
+      this.worksCountText = t('work.worksCount', { count: count });
+    },
+
+    /**
+     * Get category label for current locale
+     */
+    categoryLabel(id) {
+      return t('categories.' + id + '.label');
+    },
+
+    /**
+     * Get category icon
+     */
+    categoryIcon(id) {
+      return getCategoryIcon(id);
+    },
+
+    /**
+     * Format duration in seconds to a readable string
+     */
+    formatDuration(seconds) {
+      if (!seconds) return '';
+      const min = Math.floor(seconds / 60);
+      const sec = seconds % 60;
+      if (min > 0) {
+        return min + 'm ' + sec + 's';
+      }
+      return sec + 's';
+    },
+
+    /**
+     * Translation helper
+     */
+    t(key, params) {
+      return t(key, params);
+    },
+  };
+</script>

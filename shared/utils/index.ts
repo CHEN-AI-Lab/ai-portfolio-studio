@@ -165,3 +165,10 @@ export function resolveMediaUrl(path: string): string {
   const base = process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? '/media';
   return `${base}/${path.replace(/^\//, '')}`;
 }
+
+// ─── Social Utilities ─────────────────────────────────────────
+export { shareToTwitter, shareToWeibo, copyToClipboard } from './social';
+export { setCookie, getCookie, deleteCookie } from './cookies';
+
+// ⚠️ qiniu.ts 使用 node:crypto，仅限服务端 API 路由使用
+// 通过 'shared/utils/qiniu' 深导入，不要通过 barrel 导出

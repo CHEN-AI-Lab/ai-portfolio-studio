@@ -162,7 +162,7 @@ export function WorkGrid({
               <WorkCard
                 work={work}
                 index={index}
-                onEdit={onEditWork && work.id.startsWith('upload_') ? () => onEditWork(work) : undefined}
+                onEdit={onEditWork ? () => onEditWork(work) : undefined}
               />
             </div>
           ))}

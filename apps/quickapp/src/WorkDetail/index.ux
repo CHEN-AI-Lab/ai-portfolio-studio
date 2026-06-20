@@ -1,0 +1,347 @@
+<template>
+  <div class="page detail-page">
+    <!-- Back Button -->
+    <div class="back-btn" @click="goBack">
+      <text>← {{ t('work.back') }}</text>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-spinner" if="{{ loading }}">
+      <text>{{ t('common.loading') }}</text>
+    </div>
+
+    <!-- Error -->
+    <div class="error-state" if="{{ error }}">
+      <text class="error-state-icon">⚠️</text>
+      <text class="error-state-text">{{ t('common.error') }}</text>
+      <button class="retry-btn" @click="loadWork">{{ t('common.retry') }}</button>
+    </div>
+
+    <!-- Not Found -->
+    <div class="empty-state" if="{{ !loading && !error && !work }}">
+      <text class="empty-state-icon">📭</text>
+      <text class="empty-state-text">{{ locale === 'zh-CN' ? '作品未找到' : 'Work not found' }}</text>
+    </div>
+
+    <!-- Work Detail Content -->
+    <div if="{{ work && !loading }}">
+      <!-- Hero Media -->
+      <div class="detail-hero">
+        <image
+          if="{{ work.thumbnail }}"
+          class="detail-hero-img"
+          src="{{ work.thumbnail }}"
+          alt="{{ work.title }}"
+        />
+        <text if="{{ !work.thumbnail }}">{{ categoryIcon(work.category) }}</text>
+      </div>
+
+      <!-- Title & Description -->
+      <text class="detail-title">{{ work.title }}</text>
+      <text class="detail-description">{{ work.description }}</text>
+
+      <!-- Info Grid -->
+      <text class="section-title">{{ t('work.info') }}</text>
+      <div class="detail-info">
+        <div class="detail-info-item">
+          <text class="detail-info-label">{{ t('work.category') }}</text>
+          <text class="detail-info-value">{{ categoryLabel(work.category) }}</text>
+        </div>
+        <div class="detail-info-item">
+          <text class="detail-info-label">{{ t('work.type') }}</text>
+          <text class="detail-info-value">{{ work.type === 'video' ? t('work.video') : t('work.image') }}</text>
+        </div>
+        <div class="detail-info-item" if="{{ work.duration }}">
+          <text class="detail-info-label">{{ t('work.duration') }}</text>
+          <text class="detail-info-value">{{ formatDuration(work.duration) }}</text>
+        </div>
+        <div class="detail-info-item" if="{{ work.createdAt }}">
+          <text class="detail-info-label">{{ t('work.createdAt') }}</text>
+          <text class="detail-info-value">{{ formatDate(work.createdAt) }}</text>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div if="{{ work.tags && work.tags.length > 0 }}">
+        <text class="section-title">{{ t('work.tags') }}</text>
+        <div class="tag-list">
+          <text class="tag" for="{{ tag in work.tags }}">{{ tag }}</text>
+        </div>
+      </div>
+
+      <!-- Featured Badge -->
+      <div class="featured-badge" if="{{ work.featured }}">
+        <text class="featured-icon">⭐</text>
+        <text class="featured-text">{{ locale === 'zh-CN' ? '精选作品' : 'Featured' }}</text>
+      </div>
+
+      <!-- Media Link -->
+      <div class="media-link" if="{{ work.mediaUrl }}" @click="openMedia">
+        <text class="media-link-icon">▶️</text>
+        <text class="media-link-text">{{ t('work.preview') }}</text>
+      </div>
+
+      <!-- Bilibili Link -->
+      <div class="bilibili-link" if="{{ work.bvid }}" @click="openBilibili">
+        <text class="bilibili-icon">📺</text>
+        <text class="bilibili-text">Bilibili</text>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="nav-bar">
+      <div class="nav-item" @click="goToHome">
+        <text class="nav-item-icon">🏠</text>
+        <text class="nav-item-label">{{ t('nav.home') }}</text>
+      </div>
+      <div class="nav-item" @click="goToWorks">
+        <text class="nav-item-icon">🎨</text>
+        <text class="nav-item-label">{{ t('nav.works') }}</text>
+      </div>
+      <div class="nav-item" @click="goToAbout">
+        <text class="nav-item-icon">👤</text>
+        <text class="nav-item-label">{{ t('nav.about') }}</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  @import '../app.css';
+
+  .detail-page {
+    padding-bottom: 80px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    margin-top: 16px;
+  }
+
+  .featured-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 16px;
+  }
+
+  .featured-icon {
+    font-size: 18px;
+  }
+
+  .featured-text {
+    font-size: 13px;
+    color: #FFD700;
+    font-weight: 500;
+  }
+
+  .media-link,
+  .bilibili-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+  }
+
+  .media-link:active,
+  .bilibili-link:active {
+    border-color: var(--accent-primary);
+    background: var(--bg-card-hover);
+  }
+
+  .media-link-icon,
+  .bilibili-icon {
+    font-size: 20px;
+  }
+
+  .media-link-text {
+    font-size: 14px;
+    color: var(--accent-light);
+    font-weight: 500;
+  }
+
+  .bilibili-text {
+    font-size: 14px;
+    color: #00A1D6;
+    font-weight: 500;
+  }
+</style>
+
+<script>
+  import { t, getLocale, setLocale, getCategoryIcon } from '../i18n';
+  import { fetchWorkById } from '../api';
+  import { navigateTo, navigateBack, ROUTES } from '../../router';
+
+  export default {
+    data: {
+      locale: 'zh-CN',
+      loading: true,
+      error: false,
+      work: null,
+    },
+
+    onInit() {
+      this._syncLocale();
+      const router = require('@system.router');
+      const params = router ? router.getParams() : {};
+      if (params && params.id) {
+        this.workId = params.id;
+        this.loadWork();
+      } else {
+        this.loading = false;
+        this.error = true;
+      }
+    },
+
+    onShow() {
+      this._syncLocale();
+    },
+
+    onMessage(event) {
+      if (event && event.type === 'locale-changed') {
+        this.locale = event.data.locale;
+      }
+    },
+
+    /**
+     * Load a single work by ID
+     */
+    loadWork() {
+      const self = this;
+      self.loading = true;
+      self.error = false;
+
+      fetchWorkById(self.workId)
+        .then(function (work) {
+          self.work = work;
+          self.loading = false;
+          if (!work) {
+            self.error = true;
+          }
+        })
+        .catch(function (err) {
+          self.loading = false;
+          self.error = true;
+        });
+    },
+
+    /**
+     * Go back to previous page
+     */
+    goBack() {
+      navigateBack();
+    },
+
+    /**
+     * Navigate to Works page
+     */
+    goToWorks() {
+      navigateTo('Works');
+    },
+
+    /**
+     * Navigate to Home
+     */
+    goToHome() {
+      navigateTo('Home');
+    },
+
+    /**
+     * Navigate to About
+     */
+    goToAbout() {
+      navigateTo('About');
+    },
+
+    /**
+     * Open media URL (delegates to system browser)
+     */
+    openMedia() {
+      if (this.work && this.work.mediaUrl) {
+        const router = require('@system.router');
+        // In Quick App, use webview or system browser to open external URLs
+        const webview = require('@system.webview');
+        if (webview) {
+          webview.loadUrl({ url: this.work.mediaUrl });
+        }
+      }
+    },
+
+    /**
+     * Open Bilibili video
+     */
+    openBilibili() {
+      if (this.work && this.work.bvid) {
+        const url = 'https://www.bilibili.com/video/' + this.work.bvid;
+        const webview = require('@system.webview');
+        if (webview) {
+          webview.loadUrl({ url: url });
+        }
+      }
+    },
+
+    /**
+     * Format duration
+     */
+    formatDuration(seconds) {
+      if (!seconds) return '';
+      const min = Math.floor(seconds / 60);
+      const sec = seconds % 60;
+      if (min > 0) return min + 'm ' + sec + 's';
+      return sec + 's';
+    },
+
+    /**
+     * Format date string
+     */
+    formatDate(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    },
+
+    /**
+     * Category label
+     */
+    categoryLabel(id) {
+      return t('categories.' + id + '.label');
+    },
+
+    /**
+     * Category icon
+     */
+    categoryIcon(id) {
+      return getCategoryIcon(id);
+    },
+
+    /**
+     * Sync locale
+     */
+    _syncLocale() {
+      this.locale = getLocale();
+    },
+
+    /**
+     * Translation helper
+     */
+    t(key, params) {
+      return t(key, params);
+    },
+  };
+</script>

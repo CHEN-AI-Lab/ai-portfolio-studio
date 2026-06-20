@@ -55,7 +55,13 @@ export default function WorksPage() {
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.works)) {
-          setUploadedWorks(data.works);
+          // Map Supabase field names to WorkItem field names
+          const mapped = data.works.map((w: any) => ({
+            ...w,
+            createdAt: w.created_at || w.createdAt || '',
+            mediaUrl: w.image_url || w.mediaUrl || '',
+          }))
+          setUploadedWorks(mapped);
         }
       })
       .catch(() => {});
@@ -304,7 +310,7 @@ export default function WorksPage() {
                         <WorkCard
                           work={work}
                           index={i}
-                          onEdit={work.id.startsWith('upload_') ? () => setEditingWork(work) : undefined}
+                          onEdit={() => setEditingWork(work)}
                         />
                       </div>
                     ))}

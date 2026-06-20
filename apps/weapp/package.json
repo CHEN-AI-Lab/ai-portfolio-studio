@@ -1,0 +1,36 @@
+{
+  "name": "ai-portfolio-weapp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:weapp": "taro build --type weapp --watch",
+    "build:weapp": "taro build --type weapp",
+    "dev:quickapp": "taro build --type quickapp --watch",
+    "build:quickapp": "taro build --type quickapp"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.24.0",
+    "@tarojs/components": "3.6.40",
+    "@tarojs/plugin-framework-react": "3.6.40",
+    "@tarojs/runtime": "3.6.40",
+    "@tarojs/taro": "3.6.40",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@babel/plugin-transform-runtime": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "@babel/preset-react": "^7.24.0",
+    "@babel/preset-typescript": "^7.24.0",
+    "@tarojs/cli": "3.6.40",
+    "@tarojs/mini-runner": "3.6.40",
+    "@tarojs/webpack5-runner": "3.6.40",
+    "@tarojs/plugin-platform-weapp": "3.6.40",
+    "@types/react": "^18.2.0",
+    "@types/webpack-env": "^1.18.0",
+    "babel-preset-taro": "3.6.40",
+    "typescript": "^5.3.0"
+  }
+}

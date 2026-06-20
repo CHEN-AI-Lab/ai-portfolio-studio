@@ -1,0 +1,80 @@
+{
+  "package": "com.aicreativestudio.portfolio",
+  "name": "AI创艺工坊",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "minPlatformVersion": "1070",
+  "icon": "/common/logo.png",
+  "mode": "standard",
+  "features": [
+    {
+      "name": "system.fetch"
+    },
+    {
+      "name": "system.router"
+    },
+    {
+      "name": "system.storage"
+    },
+    {
+      "name": "system.device"
+    }
+  ],
+  "permissions": [
+    {
+      "origin": "*",
+      "allowed": ["fetch"]
+    }
+  ],
+  "config": {
+    "window": {
+      "statusBarBackgroundColor": "#0A0A0F",
+      "titleBarBackgroundColor": "#0A0A0F",
+      "titleBarTextColor": "#FFFFFF",
+      "navigationBarBackgroundColor": "#0A0A0F",
+      "navigationBarTextStyle": "white",
+      "backgroundColor": "#0A0A0F"
+    }
+  },
+  "router": {
+    "entry": "Home",
+    "pages": {
+      "Home": {
+        "component": "index",
+        "path": "/"
+      },
+      "Works": {
+        "component": "index",
+        "path": "/works"
+      },
+      "WorkDetail": {
+        "component": "index",
+        "path": "/works/detail"
+      },
+      "About": {
+        "component": "index",
+        "path": "/about"
+      }
+    }
+  },
+  "display": {
+    "titleBar": true,
+    "titleBarBackgroundColor": "#0A0A0F",
+    "titleBarTextColor": "#FFFFFF",
+    "menu": true,
+    "pages": {
+      "Home": {
+        "titleBarText": "AI 创艺工坊"
+      },
+      "Works": {
+        "titleBarText": "作品"
+      },
+      "WorkDetail": {
+        "titleBarText": "作品详情"
+      },
+      "About": {
+        "titleBarText": "关于"
+      }
+    }
+  }
+}

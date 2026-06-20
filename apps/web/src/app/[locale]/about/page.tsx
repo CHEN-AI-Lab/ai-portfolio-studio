@@ -106,7 +106,7 @@ export default function AboutPage() {
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             {SOCIAL_LINKS.map(link => (
-              <Link key={link.name} href={link.url} style={{
+              <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" style={{
                 display: 'inline-flex', alignItems: 'center', gap: '8px',
                 padding: '10px 20px', borderRadius: '8px',
                 background: 'rgba(255,255,255,0.05)', color: '#A0A0B0',
@@ -119,7 +119,7 @@ export default function AboutPage() {
               >
                 <span>{link.icon}</span>
                 <span>{link.name}</span>
-              </Link>
+              </a>
             ))}
           </div>
         </div>
@@ -131,7 +131,7 @@ export default function AboutPage() {
       }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', color: '#fff' }}>
-            📧 {locale === 'zh-CN' ? '联系我' : 'Contact'}
+            📧 {t('contactMe')}
           </h2>
           <a
             href="mailto:phoebe.yanxi@gmail.com"

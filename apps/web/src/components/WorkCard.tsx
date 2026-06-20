@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import type { WorkItem } from 'shared';
 import { CATEGORIES } from 'shared';
-import { shareToTwitter, copyToClipboard } from 'shared/utils/social';
+import { shareToTwitter, copyToClipboard } from 'shared';
 
 // ─── VideoThumbnail ────────────────────────────────
 // Shows the first frame of a video once loaded.
@@ -133,7 +133,7 @@ export function WorkCard({ work, index, className, priority = false, onEdit }: W
       const url = `${window.location.origin}/works/${work.id}`;
       window.open(shareToTwitter({ url, title: work.title, description: work.description }), '_blank', 'noopener');
     },
-    [locale, work.id, work.title, work.description],
+    [work.id, work.title, work.description],
   );
 
   const handleCopyLink = useCallback(
@@ -148,7 +148,7 @@ export function WorkCard({ work, index, className, priority = false, onEdit }: W
         }
       });
     },
-    [locale, work.id],
+    [work.id],
   );
 
   return (

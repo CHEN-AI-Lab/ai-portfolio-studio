@@ -1,85 +1,160 @@
-# Architecture Decision Records
+# AI Portfolio Studio — Architecture
 
-## Project: AI Portfolio Studio (ai-portfolio-studio)
+## 🔴 Hard Rules (ALL agents)
 
-### ADR-001: Static Data Architecture
+These rules are enforced for every project. Violations must be fixed immediately.
 
-**Date:** 2024-06-04
+1. **Only modify what was asked** — no refactoring, no deleting, no adding features beyond the request. Verify old functionality after every change.
+2. **Code placement** — all cross-platform code (types/utils/constants/validators/api/hooks/messages) goes in `shared/`. `apps/web/src/` only has `app/` (pages) and `components/` (UI).
+3. **Bilingual i18n** — every user-facing string must use `useTranslations()`. Hardcoded Chinese or English in JSX is forbidden.
+4. **Harness skeleton must be complete** — CLAUDE.md + docs/ + scripts/ + tests/ + CI. Missing any = add before feature code.
+5. **Update docs on every change** — progress.md, decisions.md, architecture.md must be updated whenever features are added or modified.
+6. **No hardcoded secrets** — all credentials from `/home/ubuntu/workspace/global.env` only.
 
-**Context:** This portfolio site needs to display works (videos + images) with filtering, categorization, and tags. No user-generated content, no real-time updates needed.
+## Overview
 
-**Decision:** Use a static data architecture:
-- Works are stored as files in `apps/web/public/works/` organized by category
-- `scripts/generate-works.mjs` scans the directory and generates `shared/data/works-data.ts`
-- All data is loaded at build time via `WORKS_DATA` array
-- No database, no API, no CMS
+A bilingual (zh-CN/en) portfolio website for AI video creators. Built with Next.js 14 App Router, Supabase for data persistence, and deployed on Vercel.
 
-**Consequences:**
-+ Zero maintenance, fast builds, no hosting cost for data layer
-+ Simple deployment (static export or serverless)
-- Adding/updating works requires running a script
-- No real-time editing capability
+## Tech Stack
 
-### ADR-002: next-intl v3 Cookie-Only i18n
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 14 App Router |
+| Language | TypeScript (strict mode) |
+| Styling | SCSS modules + inline styles |
+| i18n | next-intl v3 |
+| Database | Supabase (PostgreSQL + Storage) |
+| Monorepo | pnpm workspace |
+| Build | Turbo repo |
+| CI | GitHub Actions |
+| Testing | Vitest |
 
-**Date:** 2024-06-04
+## Project Structure
 
-**Context:** Need bilingual support (zh-CN + en). Traditional next-intl setup uses middleware for locale detection.
+```
+/
+├── apps/web/          # Next.js web application
+├── shared/             # Cross-platform shared code
+│   ├── types/          # TypeScript interfaces
+│   ├── constants/      # Category definitions, site config
+│   ├── utils/          # Pure utility functions
+│   ├── api/            # Supabase client (CRUD)
+│   ├── hooks/          # Shared React hooks (useLocale)
+│   ├── validators/     # Zod schemas
+│   └── messages/       # i18n translations (zh-CN/en)
+├── scripts/            # Setup, check, deploy
+├── tests/              # Unit + E2E tests
+├── docs/               # Architecture, progress, decisions
+└── .github/workflows/  # CI pipeline
+```
 
-**Decision:** Use cookie-only locale detection:
-- `i18n/request.ts` uses `cookies()` from `next/headers`
-- LanguageSwitcher sets a cookie and refreshes
-- No middleware.ts for locale routing
+## Data Flow
 
-**Consequences:**
-+ Simpler routing (no locale prefix in middleware)
-+ Consistent with user's preference
-+ Cookie remembers preference across sessions
+### Upload Flow (B站 video)
+```
+User → UploadModal → POST /api/works/upload → fetch B站 API for title/cover → Supabase works table
+```
 
-### ADR-003: Monorepo with pnpm + Turborepo
+### Upload Flow (Image)
+```
+User → UploadModal → POST /api/works/upload → upload file to Supabase Storage → write metadata to works table
+```
 
-**Date:** 2024-06-04
+### Display Flow
+```
+Works page → fetch static WORKS_DATA + GET /api/works/uploads → merge → display cards
+```
 
-**Context:** Multiple apps may share code (types, utils, constants).
+## Key Design Decisions
 
-**Decision:** pnpm workspace monorepo with Turborepo:
-- `shared/` package for cross-app code
-- `apps/web` for the Next.js app
-- Turborepo for build orchestration
+- **Static + dynamic data**: Static WORKS_DATA is now empty (removed). All works are stored in Supabase.
+- **No auth system**: Upload is password-protected (UPLOAD_SECRET env var), not user auth.
+- **Edit/delete**: All works get edit/delete buttons via EditWorkModal.
+- **B站 thumbnails**: Cover URL converted from `http://` to `https://` for Vercel HTTPS compatibility.
 
-**Consequences:**
-+ Type sharing without copy-paste
-+ Consistent dependency management
-+ Build caching
+## Supabase Schema
 
-### ADR-004: CSS Strategy — Hybrid SCSS + styled-jsx
+```sql
+works (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT DEFAULT '',
+  category TEXT NOT NULL,
+  type TEXT NOT NULL DEFAULT 'video',
+  bvid TEXT,
+  image_url TEXT,
+  thumbnail TEXT DEFAULT '',
+  tags JSONB DEFAULT '[]'::jsonb,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  featured BOOLEAN DEFAULT FALSE
+)
+```
 
-**Date:** 2024-06-04
+## API Routes
 
-**Context:** Need a design system with global variables + component-level scoping.
+| Route | Method | Purpose |
+|-------|--------|---------|
+| /api/works/upload | POST | Upload new work (B站 or image) |
+| /api/works/uploads | GET | List uploaded works |
+| /api/works/uploads | DELETE | Delete a work |
+| /api/works/uploads | PUT | Update a work (title, tags, description, bvid, featured) |
+| /api/works/view | POST | Record a view for a work |
+| /api/bilibili/info | GET | Fetch B站 video metadata by BV number |
+| /api/works/quick-upload | POST | Quick upload with auto-detection |
 
-**Decision:** Hybrid approach:
-- SCSS variables/mixins in `styles/_variables.scss`, `_mixins.scss`
-- SCSS modules for global styles (`globals.scss`)
-- styled-jsx for component-scoped styles (in page/component files)
-- CSS custom properties bridged from SCSS vars
+## Page Routes
 
-**Consequences:**
-+ Design tokens available everywhere
-+ Component styles co-located with component
-- Inconsistent (two styling approaches mixed)
-- Future consideration: migrate to CSS modules exclusively
+| Route | Type | Purpose |
+|-------|------|---------|
+| /[locale] | Dynamic | Home page: Hero + Featured Carousel + Category sections |
+| /[locale]/works | Dynamic | Full works grid with filter/sort |
+| /[locale]/works/[id] | Dynamic | Work detail page with video/image player |
+| /[locale]/about | Dynamic | About page with skills, social links |
+| /[locale]/resume | Dynamic | Resume/CV page, server-component rendered |
+| /[locale]/admin | Dynamic | Admin dashboard (password-protected) |
 
-### ADR-005: No Backend — Static Contact Form
+## Components Added (2026-06-20)
 
-**Date:** 2024-06-04
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| FeaturedCarousel | apps/web/src/components/ | Horizontal scrollable carousel for featured works |
+| AdminPage | apps/web/src/app/[locale]/admin/ | Password-gated dashboard with stats + works table |
 
-**Context:** Contact form needs to send user messages somewhere.
+## Data Flow
 
-**Decision:** Initially implement client-side form with no backend API. POST to `/api/contact` endpoint remains unimplemented.
-- Future options: Netlify Forms, Formspree, or custom API
-- For now: client-side validation only, submit endpoint is a stub
+### Upload Flow (B站 video)
+```
+User → UploadModal → POST /api/works/upload → fetch B站 API for title/cover → Supabase works table
+```
 
-**Consequences:**
-+ Quick to build
-- Form doesn't actually work (need backend or form service to implement)
+### Upload Flow (Image)
+```
+User → UploadModal → POST /api/works/upload → upload file to Supabase Storage → write metadata to works table
+```
+
+### Display Flow
+```
+Works page → fetch static WORKS_DATA + GET /api/works/uploads → merge → display cards
+```
+
+### View Tracking Flow
+```
+User opens work detail → useEffect fires POST /api/works/view (id) → increment Supabase works.views → admin dashboard shows counts
+```
+
+### Admin Flow
+```
+User visits /[locale]/admin → enters password → unlocks → fetches GET /api/works/uploads → displays stats + table
+→ toggle featured: PUT /api/works/uploads (id, featured)
+→ delete: DELETE /api/works/uploads (id)
+```
+
+## Key Design Decisions
+
+- **Static + dynamic data**: Static WORKS_DATA is now empty (removed). All works are stored in Supabase.
+- **No auth system**: Upload is password-protected (UPLOAD_SECRET env var), not user auth.
+- **Edit/delete**: All works get edit/delete buttons via EditWorkModal.
+- **B站 thumbnails**: Cover URL converted from `http://` to `https://` for Vercel HTTPS compatibility.
+- **Admin + upload share password**: Same UPLOAD_SECRET for both admin access and upload protection.
+- **View tracking**: Fire-and-forget POST on detail page load; increments `views` column on Supabase.

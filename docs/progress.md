@@ -1,99 +1,59 @@
-# Progress Tracker
+# Progress
 
-## 2026-06-04: Project Initialization
+## Current State (2026-06-20)
 
-- [x] Harness skeleton (CLAUDE.md, docs/, scripts/, tests/, .env.example)
-- [x] pnpm monorepo + Turborepo setup
-- [x] Next.js 14 App Router scaffolding
-- [x] `shared/` package with types, utils, constants
-- [x] SCSS design system (variables, mixins, globals)
-- [x] next-intl i18n setup (zh-CN + en)
-- [x] NavBar (glass effect, desktop/mobile)
-- [x] Footer (social icons, navigation, copyright)
-- [x] HeroSection (gradient title, stats, CTA buttons)
-- [x] WorkCard component (thumbnails, tags, share/copy)
-- [x] WorkGrid component (filtering, search, responsive grid)
-- [x] Video player with thumbnail from first frame
-- [x] Image lightbox
-- [x] Category filter pills on Works page
-- [x] Tag filter pills on Works page
-- [x] Sort dropdown on Works page
-- [x] Work detail page (media, description, tags, prev/next)
-- [x] About page (avatar, bio, skills grid, social links, contact)
-- [x] Resume page (experience timeline, skills, education, download)
-- [x] Home page (hero, category showcases, about preview)
-- [x] Scroll-to-top button
-- [x] Language switcher
-- [x] Scroll-triggered animations (about section)
-- [x] sitemap.ts
-- [x] robots.ts
+### Completed
+- ✅ Basic portfolio site (works grid, detail page, B站 embed)
+- ✅ Supabase integration (works CRUD, Storage for images)
+- ✅ i18n zh-CN / en bilingual
+- ✅ Upload modal with password protection
+- ✅ Edit/delete functionality for all works
+- ✅ EditWorkModal with save/delete
+- ✅ Close modal resets form state
+- ✅ Password toggle (show/hide)
+- ✅ B站 thumbnail HTTPS fix
+- ✅ File dropzone + description textarea size reduced
+- ✅ Clear "Upload Image" vs "Upload Video" labels
+- ✅ Harness skeleton: docs/, scripts/, tests/, CI
+- ✅ Vitest unit tests (3 tests passing)
+- ✅ Phase 3 code quality clean: no console.log in production code, no unnecessary deps
+- ✅ Admin Dashboard (/admin) — password-protected work management with stats, featured toggle, delete
+- ✅ Featured Works Carousel — horizontal scrolling on homepage for featured works
+- ✅ View Counter API — tracks views per work detail page, displayed in admin stats
 
-## 2026-06-06: Project Framework + Audit
+### 2026-06-20 New Features
+- **Admin Dashboard**: New `/admin` route. Password-protected (uses UPLOAD_SECRET). Shows stats cards (total works, videos, images, categories, total views) and a full works table with inline featured toggle and delete.
+- **Featured Works Carousel**: New `FeaturedCarousel` component on the homepage. Horizontal scrollable row of featured works with prev/next arrow buttons.
+- **View Tracking**: New `/api/works/view` POST endpoint. Work detail page records a view on load. View counts visible in admin dashboard.
+- **API Enhancement**: PUT `/api/works/uploads` now supports `featured` field for toggling featured status.
+- **NavBar update**: Added "管理/Admin" link to navigation.
+- **i18n**: Added `admin.*` and `nav.admin` translation keys in both zh-CN and en.
+- **Shared hook**: `shared/hooks/useWorks.ts` — 通用 works 数据获取 hook，支持 web/RN/Taro 多平台。
+- **全平台覆盖**：5 个端全部创建完毕
 
-- [x] Created `docs/project-framework.md` — full project planning doc
-- [x] Created `docs/architecture.md` — ADR records
-- [x] Created `docs/progress.md` — progress tracking
-- [x] Created `docs/decisions.md` — key decisions log
+### 多端一览
 
-## 2026-06-11: Bug Fixes & Polish
+| 端 | 目录 | 框架 | 文件数 | 状态 |
+|---|------|------|--------|------|
+| Web 网站 | `apps/web/` | Next.js 14 | 45+ | ✅ 生产部署中 |
+| 微信小程序 | `apps/weapp/` | Taro 3.6 + React | 33 | ✅ 代码完整 |
+| 手机 App | `apps/app/` | Expo / React Native | 18 | ✅ 代码完整 |
+| 桌面端 | `apps/desktop/` | Tauri v2 + Vanilla JS | 16 | ✅ 代码完整 |
+| 快应用 | `apps/quickapp/` | Quick App Alliance | 16 | ✅ 代码完整 |
 
-### WORKS_DATA Quality Fix
-- [x] Fixed `scripts/generate-works.mjs` to skip `.thumb.*` files
-- [x] Synced media files from `apps/web/public/works/` to root `works/` directory
-- [x] Added comprehensive `_meta.json` files for all categories
-- [x] Re-generated WORKS_DATA: 20 entries, no duplicates, no empty descriptions
-- [x] 2 featured works marked (元宵节动画, 无人机灯光秀)
+### Known Issues
+- Video files (>100MB) excluded from Vercel deploy. Works with B站 embeds still function.
+- Local video files without B站 embed will show broken player on production if video files are missing.
 
-### Translation & i18n Fixes
-- [x] Fixed prev/next labels: 上一页/下一页 → 上一个/下一个 (zh-CN)
-- [x] Category pills use bilingual constants correctly
-
-### Visual Polish
-- [x] Page transition animations — fade-in + subtle slide-up (400ms ease-out)
-- [x] Ambient glow effects — 4 CSS gradient orbs on home page
-- [x] Scroll-triggered reveal animations — IntersectionObserver-based
-- [x] All animations respect `prefers-reduced-motion`
-
-## 2026-06-12: Major Feature Release — Upload/Edit/Delete + Polish
-
-### User Upload System
-- [x] UploadModal — manual upload with file picker, auto-classification, auto-tags
-- [x] QuickUploadButton — one-click upload with drag & drop
-- [x] `/api/works/upload` — handles file upload + metadata
-- [x] `/api/works/quick-upload` — auto-classify + auto-title + auto-tags
-- [x] `/api/works/uploads` — GET (list), PUT (edit), DELETE routes
-- [x] `data/user-uploads.json` manifest with 1 uploaded work
-- [x] Uploaded works shown in Works page alongside static works
-- [x] Work detail page shows both static + uploaded works
-
-### Edit & Delete
-- [x] EditWorkModal — edit title, tags, description, B站 BV号
-- [x] Delete work with confirmation dialog
-- [x] Toast notifications for CRUD operations (success/error)
-
-### Scrollbar Fix
-- [x] Double scrollbar on page refresh — fixed (html overflow-y: scroll, body overflow-y: visible)
-
-### Resume Enhancements
-- [x] Download button changed to `window.print()` — no more missing PDF
-- [x] Print styles — `@media print` hides nav, footer, social icons, language switcher, download button
-- [x] Timeline dot position fixed (left: 2px → left: -28px, centered on timeline)
-- [x] Education section hides when empty
-- [x] Education entries cleared in translation files
-
-### Contact Page Removed
-- [x] Contact page deleted (user requested)
-- [x] NavBar contact link removed
-- [x] API route `/api/contact` removed
-- [x] SCSS import cleaned up
-
-### Code Quality
-- [x] ESLint configured (`.eslintrc.json` — next/core-web-vitals)
-- [x] Resume page `any` types replaced with proper `ResumeEntry` / `EducationEntry` interfaces
-- [x] No console.log in production code (API routes use console.error for errors only)
-- [x] Git repo initialized
-
-### Known Issues (not code bugs)
-- [ ] Social links still placeholder URLs (Bilibili `your-id`, YouTube/Twitter/GitHub generic) — needs user to provide real profile URLs
-- [ ] Resume work experience entries (entries/educationEntries) empty in translation files — needs user to provide career history
-- [ ] No deployment configured yet
+### Previously Fixed
+- Works detail page loading state (UUID works now show loading instead of error)
+- Invalid Date display (created_at → createdAt field mapping)
+- Image covers not showing (Supabase domain added to next.config remotePatterns)
+- "在B站观看" badge removed (click thumbnail to go to B站)
+- Stale WORKS_DATA deleted (works/ directory and prebuild script removed)
+- Static "placeholder" works removed
+- B站 thumbnails converted from http:// to https://
+- Works page stale closure (groupedWorks useMemo fixed)
+- Filled missing translation keys (11 keys in EditWorkModal)
+- Resume skills bilingual
+- Social links/URLs updated

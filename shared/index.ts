@@ -5,3 +5,6 @@ export * from './utils';
 export * from './api';
 export * from './hooks';
 export * from './data/works-data';
+export * from './utils/social';
+export * from './i18n';
+export * from './api/client';

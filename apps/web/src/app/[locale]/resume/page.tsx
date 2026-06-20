@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+import { getLocale } from 'next-intl/server'
 import { Link } from '@/navigation'
 import { DownloadButton } from '@/components/DownloadButton'
 import { EmailReveal } from '@/components/EmailReveal'
@@ -22,7 +23,7 @@ interface EducationEntry {
 // Experience entries and skills come from translation files
 // so they can be localized per language.
 
-const DEFAULT_SKILLS = [
+const DEFAULT_SKILLS_ZH = [
   '即梦AI',
   'LibTV',
   'deepseek',
@@ -35,6 +36,21 @@ const DEFAULT_SKILLS = [
   '剪映',
   'AI 视频生成',
   'AI 图像生成',
+]
+
+const DEFAULT_SKILLS_EN = [
+  'Jimeng AI',
+  'LibTV',
+  'DeepSeek',
+  'ChatGPT',
+  'Claude Code',
+  'Midjourney',
+  'Suno',
+  'ComfyUI',
+  'Stable Diffusion',
+  'CapCut',
+  'AI Video Generation',
+  'AI Image Generation',
 ]
 
 // Fallback experience data in case entries array is empty
@@ -57,6 +73,8 @@ const DEFAULT_EXPERIENCE = [
 
 export default async function ResumePage() {
   const t = await getTranslations('resume')
+  const locale = await getLocale()
+  const DEFAULT_SKILLS = locale === 'zh-CN' ? DEFAULT_SKILLS_ZH : DEFAULT_SKILLS_EN
   const EDUCATION = t.raw('educationEntries') as EducationEntry[]
   const CERTIFICATES = (t.raw('certificateEntries') as string[] | undefined)?.length
     ? (t.raw('certificateEntries') as string[])

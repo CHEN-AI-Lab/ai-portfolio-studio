@@ -231,15 +231,20 @@ ai-portfolio-studio/
 
 ## 9. 已知问题清单
 
-1. layout.tsx preloads 不存在的 `/media/placeholder-1.jpg` 和 `/media/placeholder-2.jpg` (404)
-2. 无 favicon (404)
-3. 关于页邮箱是占位符 `hello@example.com`
-4. 关于页社交链接全部是 `#`
-5. 联系表单提交到不存在的 `/api/contact`
-6. 简历页教育数据硬编码（学校名 "University"）
-7. 部分作品标题只有数字 (100, 102, 104, 200, 201, 202)
-8. 所有作品 description 为空
-9. Works 页分类 pill 始终显示中文标签（切英文时不变）
-10. 作品详情页 prev/next 导航标签不准确
-11. 无页面过渡动画
-12. 无 OpenGraph image
+（以下清单基于旧版静态数据架构，大部分问题已在 Supabase 迁移后修复）
+
+### 已修复
+1. ✅ layout.tsx preloads 不存在的 placeholder 图片（已移除）
+2. ✅ 无 favicon（已添加 SVG favicon）
+3. ✅ 关于页邮箱占位符（已改为真实邮箱）
+4. ✅ 关于页社交链接 #（已改为真实链接）
+5. ✅ 无 OpenGraph image（已添加 og-default.svg）
+6. ✅ Works 页分类 pill 中文标签（已改为 locale 感知）
+7. ✅ 作品详情页 prev/next 导航标签（已修复）
+
+### 当前仍存在的问题
+1. ⏳ 部分作品标题只有数字（100, 102, 104, 200, 201, 202）— 需用户补充
+2. ⏳ 所有作品 description 为空 — 需用户补充
+3. ⏳ 无页面过渡动画 — 低优先级
+4. ❌ 联系表单 `/api/contact` 未实现（当前用 mailto 链接替代）
+5. ⏳ 简历页教育数据 — 需用户补充学位信息

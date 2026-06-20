@@ -8,10 +8,11 @@ import { ImageLightbox } from '@/components/ImageLightbox'
 import type { WorkItem, WorkCategory } from 'shared'
 import { CATEGORIES, WORKS_DATA } from 'shared'
 import { useState, useCallback, useEffect } from 'react'
-import { shareToTwitter, copyToClipboard } from 'shared/utils/social'
+import Image from 'next/image'
+import { shareToTwitter, copyToClipboard } from 'shared'
 
 // ─── All works (static + user uploads) ─────────────────
-function getAllWorks(staticOnly = false): WorkItem[] {
+function getAllWorks(uploadedWorks: WorkItem[] = []): WorkItem[] {
   const staticWorks = WORKS_DATA.filter(w => w.file).map((w) => ({
     id: w.id,
     title: w.title,
@@ -25,44 +26,11 @@ function getAllWorks(staticOnly = false): WorkItem[] {
     createdAt: w.createdAt || new Date().toISOString(),
     featured: w.featured,
   }));
-  if (staticOnly) return staticWorks;
-  return staticWorks;
+  return [...staticWorks, ...uploadedWorks];
 }
 
-// ─── Uploaded works cache (fetched once) ────────────────────────────
-let uploadedWorksCache: WorkItem[] | null = null;
-let uploadsPromise: Promise<WorkItem[]> | null = null;
-
-function getUploadedWorks(): Promise<WorkItem[]> {
-  if (uploadedWorksCache) return Promise.resolve(uploadedWorksCache);
-  if (uploadsPromise) return uploadsPromise;
-
-  uploadsPromise = fetch('/api/works/uploads')
-    .then(r => r.json())
-    .then(data => {
-      uploadedWorksCache = (data.works ?? []) as WorkItem[];
-      return uploadedWorksCache;
-    })
-    .catch(() => {
-      uploadedWorksCache = [];
-      return [];
-    });
-
-  return uploadsPromise;
-}
-
-function getWorkById(id: string): WorkItem | undefined {
-  return getAllWorks().find(w => w.id === id);
-}
-
-async function getWorkByIdAsync(id: string): Promise<WorkItem | undefined> {
-  // First check static works
-  const staticResult = getWorkById(id);
-  if (staticResult) return staticResult;
-
-  // Then check uploaded works
-  const uploaded = await getUploadedWorks();
-  return uploaded.find(w => w.id === id);
+function getWorkById(id: string, uploadedWorks: WorkItem[] = []): WorkItem | undefined {
+  return getAllWorks(uploadedWorks).find(w => w.id === id);
 }
 
 function formatDuration(seconds: number): string {
@@ -102,17 +70,11 @@ function ImagePreview({ src, alt, onOpen }: { src: string; alt: string; onOpen: 
         border: '1px solid rgba(255,255,255,0.05)',
       }}
     >
-      <img
+      <Image
         src={src}
         alt={alt}
-        ref={(el) => {
-          if (!el || aspectRatio !== '16 / 9') return;
-          // Check if image already loaded (handles hydration gap)
-          if (el.complete && el.naturalWidth && el.naturalHeight) {
-            setAspectRatio(`${el.naturalWidth} / ${el.naturalHeight}`);
-            setIsPortrait(el.naturalHeight > el.naturalWidth);
-          }
-        }}
+        fill
+        style={{ objectFit: 'contain' }}
         onLoad={(e) => {
           const img = e.currentTarget;
           if (img.naturalWidth && img.naturalHeight) {
@@ -120,11 +82,7 @@ function ImagePreview({ src, alt, onOpen }: { src: string; alt: string; onOpen: 
             setIsPortrait(img.naturalHeight > img.naturalWidth);
           }
         }}
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'contain',
-        }}
+        sizes="(max-width: 960px) 100vw, 960px"
       />
       <div style={{
         position: 'absolute',
@@ -165,13 +123,30 @@ export default function WorkDetailPage() {
     fetch('/api/works/uploads')
       .then(res => res.ok ? res.json() : { works: [] })
       .then(data => {
-        setUploadedWorks(data.works ?? [])
+        const works = (data.works ?? []).map((w: any) => ({
+          ...w,
+          createdAt: w.created_at || w.createdAt || '',
+          mediaUrl: w.image_url || w.mediaUrl || '',
+        }));
+        setUploadedWorks(works)
         setUploadedLoaded(true)
       })
       .catch(() => setUploadedLoaded(true))
   }, [])
 
-  const allWorks = [...getAllWorks(), ...uploadedWorks]
+  // Record a view when this work detail page is loaded
+  useEffect(() => {
+    const id = decodeURIComponent((params?.id as string) ?? '')
+    if (id) {
+      fetch('/api/works/view', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      }).catch(() => {})
+    }
+  }, [params?.id])
+
+  const allWorks = getAllWorks(uploadedWorks)
   // Next.js params are already decoded — match directly
   const work = allWorks.find(w => w.id === id)
 
@@ -210,7 +185,7 @@ export default function WorkDetailPage() {
 
   if (!work) {
     // If work is not found but uploads haven't loaded yet, show loading
-    if (!uploadedLoaded && id.startsWith('upload_')) {
+    if (!uploadedLoaded) {
       return (
         <div className="work-detail-page">
           <div className="container" style={{ textAlign: 'center', paddingTop: '120px', paddingBottom: '120px' }}>
@@ -369,17 +344,13 @@ export default function WorkDetailPage() {
           }}
         >
           {work.thumbnail && (
-            <img
+            <Image
               src={work.thumbnail}
-              alt={work.title}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
+              alt=""
+              fill
+              style={{ objectFit: 'cover' }}
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+              sizes="(max-width: 960px) 100vw, 960px"
             />
           )}
           {/* Dark overlay */}
@@ -406,64 +377,7 @@ export default function WorkDetailPage() {
               <path d="M8 5v14l11-7z" />
             </svg>
           </div>
-          {/* Badge */}
-          <div style={{
-            position: 'absolute', bottom: '12px', right: '12px',
-            background: 'rgba(0,161,214,0.85)',
-            backdropFilter: 'blur(4px)',
-            padding: '4px 10px',
-            borderRadius: '6px',
-            fontSize: '0.75rem',
-            color: '#fff',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-          }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .662.151.947.453L9.333 4.653h5.334l1.947-1.774c.267-.302.578-.453.934-.453.347 0 .662.124.947.373.267.25.4.551.4.907 0 .355-.133.662-.4.92l-1.174 1.027h-.507zM5.333 7.24a2.28 2.28 0 0 0-1.666.68c-.462.453-.7 1.018-.714 1.693v7.694c.014.675.252 1.24.714 1.693.461.453 1.026.68 1.693.68H18.58c.667 0 1.232-.227 1.693-.68.462-.453.7-1.018.714-1.693V9.613c-.014-.675-.252-1.24-.714-1.693a2.28 2.28 0 0 0-1.666-.68H5.333z"/>
-            </svg>
-            在B站观看
-          </div>
-        </a>
-        {/* B站 link */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginTop: '12px',
-        }}>
-          <a
-            href={`https://www.bilibili.com/video/${work.bvid}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 16px',
-              borderRadius: '8px',
-              fontSize: '0.8125rem',
-              color: '#00A1D6',
-              background: 'rgba(0, 161, 214, 0.1)',
-              border: '1px solid rgba(0, 161, 214, 0.2)',
-              textDecoration: 'none',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(0, 161, 214, 0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(0, 161, 214, 0.1)';
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              <polyline points="15 3 21 3 21 9" />
-              <line x1="10" y1="14" x2="21" y2="3" />
-            </svg>
-            {locale === 'zh-CN' ? '在B站观看' : 'Watch on Bilibili'}
-          </a>
-        </div></>
+        </a></>
           ) : work.type === 'video' ? (
             <VideoPlayer
               src={work.mediaUrl}

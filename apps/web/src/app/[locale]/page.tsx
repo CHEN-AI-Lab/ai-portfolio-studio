@@ -6,6 +6,7 @@ import { Link } from '@/navigation';
 import { HeroSection } from '@/components/HeroSection';
 import AmbientGlow from '@/components/AmbientGlow';
 import { WorkCard } from '@/components/WorkCard';
+import { FeaturedCarousel } from '@/components/FeaturedCarousel';
 import type { WorkItem, WorkCategory } from 'shared';
 import { CATEGORIES, WORKS_DATA } from 'shared';
 
@@ -40,7 +41,7 @@ export default function HomePage() {
         category: w.categoryId as WorkCategory,
         type: w.type,
         thumbnail: w.thumbnail || '',
-        mediaUrl: w.file ? `/works/${w.file}` : '',
+        mediaUrl: w.file ? `/works/${encodeURI(w.file)}` : '',
         duration: w.duration ? parseInt(w.duration.split(':').reduce((a, t) => a * 60 + parseInt(t), 0).toString()) : undefined,
         tags: w.tags,
         createdAt: w.createdAt || new Date().toISOString(),
@@ -78,6 +79,11 @@ export default function HomePage() {
       {/* Section Divider */}
       <div className="section-divider" />
 
+      {/* Featured Works Carousel */}
+      {ALL_WORKS.filter(w => w.featured).length > 0 && (
+        <FeaturedCarousel works={ALL_WORKS.filter(w => w.featured)} />
+      )}
+
       {/* Category Showcases — real works, one section per category */}
       {activeCategories.map((cat, catIndex) => {
         const catWorks = ALL_WORKS.filter(w => w.category === cat.id).slice(0, 4)
@@ -110,7 +116,7 @@ export default function HomePage() {
           overflow: clip;
         }
 
-        // ─── Section Dividers ──────────────────────────────────
+        /* ─── Section Dividers ────────────────────────────────── */
 
         .section-divider {
           height: 1px;
@@ -124,7 +130,7 @@ export default function HomePage() {
           margin: 0;
         }
 
-        // ─── Category Sections ─────────────────────────────────
+        /* ─── Category Sections ───────────────────────────────── */
         .home-cat-section {
           padding: 3rem 0;
           background: #12121A;
@@ -215,12 +221,28 @@ export default function HomePage() {
           grid-template-columns: repeat(auto-fit, 260px);
           max-width: 540px;
         }
-        @media (max-width: 639px) {
+        @media (max-width: 1023px) {
           .home-cat-section__works {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+          }
+          .home-cat-section__works--sparse {
+            max-width: 540px;
+          }
+        }
+        @media (max-width: 767px) {
+          .home-cat-section__works {
+            grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
           }
           .home-cat-section__works--sparse {
             max-width: 100%;
+          }
+        }
+        @media (max-width: 480px) {
+          .home-cat-section__works {
+            grid-template-columns: 1fr;
+            gap: 1rem;
           }
         }
         .home-cat-section__work-item {

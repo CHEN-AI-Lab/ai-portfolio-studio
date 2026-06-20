@@ -1,0 +1,311 @@
+<template>
+  <div class="page about-page">
+    <!-- Header with locale toggle -->
+    <div class="page-header">
+      <div>
+        <text class="page-title">{{ t('about.title') }}</text>
+      </div>
+      <div class="locale-toggle" @click="toggleLocale">
+        <text class="locale-btn {{ locale === 'zh-CN' ? 'active' : '' }}">中文</text>
+        <text class="locale-btn {{ locale === 'en' ? 'active' : '' }}">EN</text>
+      </div>
+    </div>
+
+    <!-- Creator Info -->
+    <div class="about-header">
+      <div class="about-avatar">
+        <text>🤖</text>
+      </div>
+      <text class="about-name">{{ locale === 'zh-CN' ? 'CHEN' : 'CHEN' }}</text>
+      <text class="about-subtitle">{{ locale === 'zh-CN' ? 'AI 视频创作者' : 'AI Video Creator' }}</text>
+      <text class="about-bio">{{ t('about.description') }}</text>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row" if="{{ stats }}">
+      <div class="stat-badge">
+        <text class="stat-value">{{ stats.totalWorks }}</text>
+        <text class="stat-label">{{ t('common.stats') }}</text>
+      </div>
+      <div class="stat-badge">
+        <text class="stat-value">{{ stats.totalVideos }}</text>
+        <text class="stat-label">{{ t('work.video') }}</text>
+      </div>
+      <div class="stat-badge">
+        <text class="stat-value">{{ stats.totalImages }}</text>
+        <text class="stat-label">{{ t('work.image') }}</text>
+      </div>
+    </div>
+
+    <!-- Loading for stats -->
+    <div class="loading-spinner" if="{{ loading }}">
+      <text>{{ t('common.loading') }}</text>
+    </div>
+
+    <!-- Skills Section -->
+    <text class="section-title">{{ t('about.skillsTitle') }}</text>
+    <div class="skill-list">
+      <text class="skill-chip" for="{{ skill in skills }}">{{ skill }}</text>
+    </div>
+
+    <!-- Tools Section -->
+    <text class="section-title">{{ t('about.toolsTitle') }}</text>
+    <div class="tool-list">
+      <text class="tool-chip" for="{{ tool in tools }}">{{ tool }}</text>
+    </div>
+
+    <!-- Social Links -->
+    <text class="section-title">{{ t('about.followMe') }}</text>
+    <text class="section-subtitle">{{ t('about.contactHint') }}</text>
+    <div class="social-links">
+      <div class="social-link" for="{{ link in socialLinks }}" @click="openSocial(link.url)">
+        <text>{{ socialIcon(link.platform) }}</text>
+      </div>
+    </div>
+
+    <!-- Contact Email -->
+    <div class="contact-item">
+      <text class="contact-label">{{ locale === 'zh-CN' ? '邮箱' : 'Email' }}</text>
+      <text class="contact-value">phoebe.yanxi@gmail.com</text>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-section">
+      <text class="footer-tagline">{{ t('footer.tagline') }}</text>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="nav-bar">
+      <div class="nav-item" @click="goToHome">
+        <text class="nav-item-icon">🏠</text>
+        <text class="nav-item-label">{{ t('nav.home') }}</text>
+      </div>
+      <div class="nav-item" @click="goToWorks">
+        <text class="nav-item-icon">🎨</text>
+        <text class="nav-item-label">{{ t('nav.works') }}</text>
+      </div>
+      <div class="nav-item active">
+        <text class="nav-item-icon">👤</text>
+        <text class="nav-item-label">{{ t('nav.about') }}</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  @import '../app.css';
+
+  .about-page {
+    padding-bottom: 80px;
+  }
+
+  .about-subtitle {
+    font-size: 14px;
+    color: var(--accent-light);
+    margin-top: 4px;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    margin-top: 24px;
+  }
+
+  .section-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .contact-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+
+  .contact-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .contact-value {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .footer-section {
+    text-align: center;
+    padding: 32px 16px;
+    margin-top: 16px;
+  }
+
+  .footer-tagline {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+</style>
+
+<script>
+  import { t, getLocale, setLocale } from '../i18n';
+  import { fetchWorks } from '../api';
+  import { navigateTo, ROUTES } from '../../router';
+
+  export default {
+    data: {
+      locale: 'zh-CN',
+      loading: true,
+      stats: null,
+      skills: [],
+      tools: [],
+      socialLinks: [],
+    },
+
+    onInit() {
+      this._syncLocale();
+      this._initStaticData();
+      this._loadStats();
+    },
+
+    onShow() {
+      this._syncLocale();
+    },
+
+    onMessage(event) {
+      if (event && event.type === 'locale-changed') {
+        this.locale = event.data.locale;
+      }
+    },
+
+    /**
+     * Initialize static creator data
+     */
+    _initStaticData() {
+      // Skills - bilingual display is handled by their names being universal
+      this.skills = [
+        'AI 视频生成 / AI Video Generation',
+        'AI 图像生成 / AI Image Generation',
+        '提示词工程 / Prompt Engineering',
+        '后期制作与剪辑 / Post-Production & Editing',
+        '视觉叙事与分镜设计 / Visual Storytelling',
+        '创意指导 / Creative Direction',
+      ];
+
+      this.tools = [
+        'Midjourney',
+        'Stable Diffusion',
+        'ComfyUI',
+        '即梦 AI',
+        '豆包',
+        '剪映专业版',
+        '哩布哩布',
+        'After Effects',
+        'DaVinci Resolve',
+      ];
+
+      this.socialLinks = [
+        { platform: 'YouTube', url: 'https://youtube.com/@aicreativestudio' },
+        { platform: 'Bilibili', url: 'https://space.bilibili.com/' },
+        { platform: 'Twitter', url: 'https://twitter.com/aicreativestudio' },
+        { platform: 'GitHub', url: 'https://github.com/aicreativestudio' },
+      ];
+    },
+
+    /**
+     * Load aggregate stats from works
+     */
+    _loadStats() {
+      const self = this;
+      fetchWorks()
+        .then(function (works) {
+          const videos = works.filter(function (w) { return w.type === 'video'; }).length;
+          const images = works.filter(function (w) { return w.type === 'image'; }).length;
+          self.stats = {
+            totalWorks: works.length,
+            totalVideos: videos,
+            totalImages: images,
+          };
+          self.loading = false;
+        })
+        .catch(function () {
+          // Default stats on failure
+          self.stats = { totalWorks: 0, totalVideos: 0, totalImages: 0 };
+          self.loading = false;
+        });
+    },
+
+    /**
+     * Map platform name to emoji icon
+     */
+    socialIcon(platform) {
+      const map = {
+        'YouTube': '📺',
+        'Bilibili': '📺',
+        'Twitter': '🐦',
+        'GitHub': '💻',
+        'default': '🔗',
+      };
+      return map[platform] || map['default'];
+    },
+
+    /**
+     * Open social link
+     */
+    openSocial(url) {
+      if (url) {
+        const webview = require('@system.webview');
+        if (webview) {
+          webview.loadUrl({ url: url });
+        }
+      }
+    },
+
+    /**
+     * Navigate to Home
+     */
+    goToHome() {
+      navigateTo('Home');
+    },
+
+    /**
+     * Navigate to Works
+     */
+    goToWorks() {
+      navigateTo('Works');
+    },
+
+    /**
+     * Toggle locale
+     */
+    toggleLocale() {
+      const newLocale = this.locale === 'zh-CN' ? 'en' : 'zh-CN';
+      this.locale = newLocale;
+      setLocale(newLocale);
+      const app = this.$app || require('@system.app');
+      if (app && app.switchLocale) {
+        app.switchLocale(newLocale);
+      }
+    },
+
+    /**
+     * Sync locale
+     */
+    _syncLocale() {
+      this.locale = getLocale();
+    },
+
+    /**
+     * Translation helper
+     */
+    t(key) {
+      return t(key);
+    },
+  };
+</script>
