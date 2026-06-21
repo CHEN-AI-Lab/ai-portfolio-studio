@@ -16,6 +16,15 @@
       ],
       "shared/*": [
         "../../shared/*"
+      ],
+      "react": [
+        "./node_modules/@types/react/index.d.ts"
+      ],
+      "next-intl": [
+        "./node_modules/next-intl"
+      ],
+      "zod": [
+        "./node_modules/zod"
       ]
     },
     "noEmit": true,
