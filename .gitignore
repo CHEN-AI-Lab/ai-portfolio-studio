@@ -8,7 +8,8 @@ dist/
 coverage/
 .vercel
 
-# Large media assets (too big for git)
+# Large media assets (too big for git, all content from B站/Supabase)
+apps/web/public/works/
 apps/web/public/user-uploads/
 works/
 works/_inbox/

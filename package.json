@@ -11,7 +11,6 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "typecheck": "turbo typecheck",
-    "generate:works": "node scripts/generate-works.mjs",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,scss}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,scss}\"",
     "clean": "turbo clean && rm -rf node_modules",

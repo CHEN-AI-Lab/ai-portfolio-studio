@@ -4,6 +4,8 @@ apps/*/.next/
 apps/*/.turbo/
 
 # Exclude user-uploads from web app
+# Exclude local media files (all content comes from B站/Supabase)
+apps/web/public/works/
 apps/web/public/user-uploads/
 
 # Development artifacts
