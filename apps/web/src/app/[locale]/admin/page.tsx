@@ -32,6 +32,20 @@ export default function AdminPage() {
   const [editingWork, setEditingWork] = useState<AdminWork | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
+  // Fetch works from Supabase
+  const fetchWorks = useCallback(async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/works/uploads')
+      const data = await res.json()
+      if (data.success && Array.isArray(data.works)) {
+        setWorks(data.works)
+      }
+    } catch {} finally {
+      setLoading(false)
+    }
+  }, [])
+
   // Persist auth across refreshes within the same browser session
   useEffect(() => {
     if (sessionStorage.getItem('admin_auth') === 'true') {
@@ -49,20 +63,6 @@ export default function AdminPage() {
 
   const handleNotify = useCallback((message: string, type: 'success' | 'error') => {
     setToast({ message, type })
-  }, [])
-
-  // Fetch works from Supabase
-  const fetchWorks = useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/works/uploads')
-      const data = await res.json()
-      if (data.success && Array.isArray(data.works)) {
-        setWorks(data.works)
-      }
-    } catch {} finally {
-      setLoading(false)
-    }
   }, [])
 
   // Handle unlock
