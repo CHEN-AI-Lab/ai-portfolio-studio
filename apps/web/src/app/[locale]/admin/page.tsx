@@ -253,6 +253,22 @@ export default function AdminPage() {
             <Link href="/works" className="admin-header__back">
               ← {t('backToSite')}
             </Link>
+            <button
+              type="button"
+              className="admin-header__logout"
+              onClick={() => {
+                sessionStorage.removeItem('admin_auth')
+                setUnlocked(false)
+                setWorks([])
+              }}
+              title={locale === 'zh-CN' ? '退出管理' : 'Log out'}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -475,6 +491,24 @@ export default function AdminPage() {
           white-space: nowrap;
         }
         .admin-header__back:hover { color: #C4B5FD; }
+        .admin-header__logout {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 8px;
+          color: #8B8B9E;
+          cursor: pointer;
+          transition: all 150ms ease;
+        }
+        .admin-header__logout:hover {
+          color: #FCA5A5;
+          background: rgba(239,68,68,0.1);
+          border-color: rgba(239,68,68,0.2);
+        }
 
         .admin-stats {
           padding: 24px 0;
