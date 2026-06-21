@@ -12,8 +12,11 @@
       "@/*": ["./src/*"],
       "shared": ["../../shared"],
       "shared/*": ["../../shared/*"],
-      "*": ["./node_modules/*"]
+      "react": ["./node_modules/react"],
+      "next-intl": ["./node_modules/next-intl"],
+      "zod": ["./node_modules/zod"]
     },
+    "typeRoots": ["./node_modules/@types", "./node_modules"],
     "noEmit": true,
     "incremental": true,
     "noUnusedLocals": false,
