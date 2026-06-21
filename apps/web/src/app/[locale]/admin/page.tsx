@@ -32,6 +32,14 @@ export default function AdminPage() {
   const [editingWork, setEditingWork] = useState<AdminWork | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
+  // Persist auth across refreshes within the same browser session
+  useEffect(() => {
+    if (sessionStorage.getItem('admin_auth') === 'true') {
+      setUnlocked(true)
+      fetchWorks()
+    }
+  }, [fetchWorks])
+
   // Auto-dismiss toast
   useEffect(() => {
     if (!toast) return
@@ -68,6 +76,7 @@ export default function AdminPage() {
       if (res.ok) {
         setUnlocked(true)
         setPwdError(false)
+        sessionStorage.setItem('admin_auth', 'true')
         fetchWorks()
       } else {
         setPwdError(true)
