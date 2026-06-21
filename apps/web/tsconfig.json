@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "jsx": "preserve",
     "plugins": [
       {
@@ -16,6 +17,12 @@
       ],
       "shared/*": [
         "../../shared/*"
+      ],
+      "next-intl": [
+        "./node_modules/next-intl"
+      ],
+      "zod": [
+        "./node_modules/zod"
       ]
     },
     "noEmit": true,
