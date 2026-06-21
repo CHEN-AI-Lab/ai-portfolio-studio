@@ -1,7 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "jsx": "preserve",
     "plugins": [
       {
@@ -9,14 +8,16 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "shared": ["../../shared"],
-      "shared/*": ["../../shared/*"],
-      "react": ["./node_modules/react"],
-      "next-intl": ["./node_modules/next-intl"],
-      "zod": ["./node_modules/zod"]
+      "@/*": [
+        "./src/*"
+      ],
+      "shared": [
+        "../../shared"
+      ],
+      "shared/*": [
+        "../../shared/*"
+      ]
     },
-    "typeRoots": ["./node_modules/@types", "./node_modules"],
     "noEmit": true,
     "incremental": true,
     "noUnusedLocals": false,
