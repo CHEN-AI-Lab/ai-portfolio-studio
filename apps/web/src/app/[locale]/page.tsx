@@ -215,7 +215,7 @@ export default function HomePage() {
         .home-cat-section__works {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 1.25rem;
+          gap: 2rem;
         }
         .home-cat-section__works--sparse {
           grid-template-columns: repeat(auto-fit, 260px);
@@ -224,7 +224,7 @@ export default function HomePage() {
         @media (max-width: 1023px) {
           .home-cat-section__works {
             grid-template-columns: repeat(3, 1fr);
-            gap: 1.25rem;
+            gap: 1.5rem;
           }
           .home-cat-section__works--sparse {
             max-width: 540px;
