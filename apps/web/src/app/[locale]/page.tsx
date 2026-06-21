@@ -89,7 +89,7 @@ export default function HomePage() {
         const catWorks = ALL_WORKS.filter(w => w.category === cat.id).slice(0, 4)
         const catLabel = locale === 'zh-CN' ? cat.label.zh : cat.label.en
         return (
-          <section key={cat.id} className={`home-cat-section ${catIndex > 0 ? 'home-cat-section--alt' : ''}`} aria-labelledby={`home-cat-${cat.id}`}>
+          <section key={cat.id} className="home-cat-section" aria-labelledby={`home-cat-${cat.id}`}>
             <div className="home-cat-section__container">
               <div className="home-cat-section__header">
                 <div className="home-cat-section__icon" aria-hidden="true">{cat.icon}</div>
