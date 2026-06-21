@@ -118,6 +118,12 @@ export default function AdminPage() {
     totalViews: works.reduce((sum, w) => sum + (w.views ?? 0), 0),
   }
 
+  // Category filter
+  const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const filteredWorks = activeCategory
+    ? works.filter(w => w.category === activeCategory)
+    : works
+
   // Password gate UI
   if (!unlocked) {
     return (
@@ -270,11 +276,45 @@ export default function AdminPage() {
 
       {/* Works table */}
       <div className="admin-table-wrap">
-        <h2 className="admin-table-title">{t('tableTitle')}</h2>
+        <div className="admin-table-header">
+          <h2 className="admin-table-title">
+            {t('tableTitle')}
+            {activeCategory && (
+              <span className="admin-table-count">
+                ({filteredWorks.length})
+              </span>
+            )}
+          </h2>
+          {/* Category filter */}
+          <div className="admin-cat-filter">
+            <button
+              type="button"
+              className={`admin-cat-filter__btn${!activeCategory ? ' active' : ''}`}
+              onClick={() => setActiveCategory(null)}
+            >
+              {locale === 'zh-CN' ? '全部' : 'All'}
+            </button>
+            {CATEGORIES.map(cat => {
+              const count = works.filter(w => w.category === cat.id).length
+              if (count === 0) return null
+              const label = locale === 'zh-CN' ? cat.label.zh : cat.label.en
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  className={`admin-cat-filter__btn${activeCategory === cat.id ? ' active' : ''}`}
+                  onClick={() => setActiveCategory(cat.id)}
+                >
+                  {cat.icon} {label} ({count})
+                </button>
+              )
+            })}
+          </div>
+        </div>
         {loading ? (
           <p style={{ color: '#6B6B80', textAlign: 'center', padding: '40px 0' }}>{ct('loading')}</p>
-        ) : works.length === 0 ? (
-          <p style={{ color: '#6B6B80', textAlign: 'center', padding: '40px 0' }}>{t('noWorks')}</p>
+        ) : filteredWorks.length === 0 ? (
+          <p style={{ color: '#6B6B80', textAlign: 'center', padding: '40px 0' }}>{activeCategory ? t('noWorks') : t('noWorks')}</p>
         ) : (
           <div className="admin-table-scroll">
             <table className="admin-table">
@@ -289,7 +329,7 @@ export default function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {works.map(w => {
+                {filteredWorks.map(w => {
                   const cat = CATEGORIES.find(c => c.id === w.category)
                   const catLabel = cat ? (locale === 'zh-CN' ? cat.label.zh : cat.label.en) : w.category
                   return (
@@ -465,11 +505,55 @@ export default function AdminPage() {
           margin: 0 auto;
           padding: 0 24px 60px;
         }
+        .admin-table-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 16px;
+        }
         .admin-table-title {
           font-size: 1.125rem;
           font-weight: 600;
           color: #FFFFFF;
-          margin: 0 0 16px;
+          margin: 0;
+        }
+        .admin-table-count {
+          font-size: 0.875rem;
+          font-weight: 400;
+          color: #6B6B80;
+          margin-left: 4px;
+        }
+        .admin-cat-filter {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+        .admin-cat-filter__btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 5px 12px;
+          font-size: 0.8125rem;
+          font-weight: 500;
+          font-family: inherit;
+          color: #8B8B9E;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.06);
+          border-radius: 9999px;
+          cursor: pointer;
+          white-space: nowrap;
+          transition: all 150ms ease;
+        }
+        .admin-cat-filter__btn:hover {
+          color: #E0E0F0;
+          background: rgba(255,255,255,0.06);
+        }
+        .admin-cat-filter__btn.active {
+          color: #FFFFFF;
+          background: rgba(124,58,237,0.15);
+          border-color: rgba(124,58,237,0.3);
         }
         .admin-table-scroll {
           overflow-x: auto;
