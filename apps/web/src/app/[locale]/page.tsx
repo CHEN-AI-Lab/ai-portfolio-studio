@@ -218,8 +218,13 @@ export default function HomePage() {
           gap: 2rem;
         }
         .home-cat-section__works--sparse {
-          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-          max-width: 100%;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 2rem;
+        }
+        .home-cat-section__works--sparse .home-cat-section__work-item {
+          flex: 0 1 300px;
+          min-width: 260px;
         }
         @media (max-width: 1023px) {
           .home-cat-section__works {
