@@ -37,6 +37,10 @@ export default function WorksPage() {
   const [uploadedWorks, setUploadedWorks] = useState<WorkItem[]>([]);
   const [editingWork, setEditingWork] = useState<WorkItem | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [pendingAction, setPendingAction] = useState<{ type: 'edit' | 'delete'; work: WorkItem } | null>(null);
+  const [pwdInput, setPwdInput] = useState('');
+  const [pwdError, setPwdError] = useState(false);
+  const [pwdVerifying, setPwdVerifying] = useState(false);
 
   // Auto-dismiss toast after 3 seconds
   useEffect(() => {
@@ -66,6 +70,26 @@ export default function WorksPage() {
       })
       .catch(() => {});
   }, []);
+
+  // Delete a work (called after password verification)
+  const handleDelete = useCallback(async (work: WorkItem) => {
+    try {
+      const res = await fetch('/api/works/uploads', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: work.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setToast({ message: '已删除', type: 'success' });
+        fetchUploadedWorks();
+      } else {
+        setToast({ message: data.error || '删除失败', type: 'error' });
+      }
+    } catch {
+      setToast({ message: '网络错误', type: 'error' });
+    }
+  }, [fetchUploadedWorks]);
 
   // Fetch user-uploaded works from the local manifest
   useEffect(() => {
@@ -288,7 +312,7 @@ export default function WorksPage() {
                   works={tagFilteredWorks}
                   loading={false}
                   hideFilters
-                  onEditWork={(work) => setEditingWork(work)}
+                  onEditWork={(work) => setPendingAction({ type: 'edit', work })}
                 />
               </div>
             </div>
@@ -310,7 +334,7 @@ export default function WorksPage() {
                         <WorkCard
                           work={work}
                           index={i}
-                          onEdit={() => setEditingWork(work)}
+                          onEdit={() => setPendingAction({ type: 'edit', work })}
                         />
                       </div>
                     ))}
@@ -321,6 +345,92 @@ export default function WorksPage() {
           )}
         </div>
       </div>
+
+      {/* Password verification dialog */}
+      {pendingAction && (
+        <div className="pwd-overlay" onClick={(e) => { if (e.target === e.currentTarget) { setPendingAction(null); setPwdError(false); setPwdInput(''); }}}>
+          <div className="pwd-dialog" role="dialog" aria-label={locale === 'zh-CN' ? '验证密码' : 'Verify Password'}>
+            <h3 className="pwd-dialog__title">
+              {locale === 'zh-CN'
+                ? pendingAction.type === 'edit' ? '验证后编辑作品' : '验证后删除作品'
+                : pendingAction.type === 'edit' ? 'Verify to edit work' : 'Verify to delete work'}
+            </h3>
+            <p className="pwd-dialog__subtitle">
+              {locale === 'zh-CN' ? '请输入管理密码继续' : 'Enter admin password to continue'}
+            </p>
+            <input
+              type="password"
+              className="pwd-dialog__input"
+              value={pwdInput}
+              onChange={(e) => { setPwdInput(e.target.value); setPwdError(false); }}
+              onKeyDown={async (e) => {
+                if (e.key !== 'Enter' || pwdVerifying) return;
+                setPwdVerifying(true);
+                try {
+                  const res = await fetch('/api/admin/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pwdInput }),
+                  });
+                  if (res.ok) {
+                    sessionStorage.setItem('works_auth', 'true');
+                    const action = pendingAction;
+                    setPendingAction(null);
+                    setPwdInput('');
+                    setPwdError(false);
+                    if (action.type === 'edit') setEditingWork(action.work);
+                    else if (action.type === 'delete') handleDelete(action.work);
+                  } else {
+                    setPwdError(true);
+                  }
+                } catch { setPwdError(true); }
+                finally { setPwdVerifying(false); }
+              }}
+              placeholder={locale === 'zh-CN' ? '输入管理密码' : 'Admin password'}
+              autoFocus
+            />
+            {pwdError && <p className="pwd-dialog__error">{locale === 'zh-CN' ? '密码错误' : 'Wrong password'}</p>}
+            <div className="pwd-dialog__actions">
+              <button
+                className="pwd-dialog__btn pwd-dialog__btn--cancel"
+                onClick={() => { setPendingAction(null); setPwdError(false); setPwdInput(''); }}
+              >
+                {locale === 'zh-CN' ? '取消' : 'Cancel'}
+              </button>
+              <button
+                className="pwd-dialog__btn pwd-dialog__btn--submit"
+                disabled={pwdVerifying || !pwdInput}
+                onClick={async () => {
+                  setPwdVerifying(true);
+                  try {
+                    const res = await fetch('/api/admin/verify', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ password: pwdInput }),
+                    });
+                    if (res.ok) {
+                      sessionStorage.setItem('works_auth', 'true');
+                      const action = pendingAction;
+                      setPendingAction(null);
+                      setPwdInput('');
+                      setPwdError(false);
+                      if (action.type === 'edit') setEditingWork(action.work);
+                      else if (action.type === 'delete') handleDelete(action.work);
+                    } else {
+                      setPwdError(true);
+                    }
+                  } catch { setPwdError(true); }
+                  finally { setPwdVerifying(false); }
+                }}
+              >
+                {pwdVerifying
+                  ? (locale === 'zh-CN' ? '验证中...' : 'Verifying...')
+                  : (locale === 'zh-CN' ? '确认' : 'Confirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Upload Modal */}
       <UploadModal
@@ -355,6 +465,88 @@ export default function WorksPage() {
       )}
 
       <style jsx>{`
+        /* Password dialog */
+        .pwd-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.6);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1100;
+          padding: 1rem;
+        }
+        .pwd-dialog {
+          background: #15152A;
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 16px;
+          padding: 32px;
+          max-width: 380px;
+          width: 100%;
+          text-align: center;
+        }
+        .pwd-dialog__title {
+          font-size: 1.125rem;
+          font-weight: 700;
+          color: #FFFFFF;
+          margin: 0 0 4px;
+        }
+        .pwd-dialog__subtitle {
+          font-size: 0.8125rem;
+          color: #6B6B80;
+          margin: 0 0 20px;
+        }
+        .pwd-dialog__input {
+          width: 100%;
+          padding: 10px 14px;
+          font-size: 0.9rem;
+          font-family: inherit;
+          color: #E0E0F0;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 8px;
+          outline: none;
+          box-sizing: border-box;
+          margin-bottom: 8px;
+        }
+        .pwd-dialog__input:focus {
+          border-color: #7C3AED;
+          box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+        }
+        .pwd-dialog__error {
+          font-size: 0.8125rem;
+          color: #EF4444;
+          margin: 0 0 12px;
+        }
+        .pwd-dialog__actions {
+          display: flex;
+          gap: 8px;
+        }
+        .pwd-dialog__btn {
+          flex: 1;
+          padding: 10px;
+          font-size: 0.875rem;
+          font-weight: 600;
+          font-family: inherit;
+          border-radius: 8px;
+          cursor: pointer;
+          border: none;
+        }
+        .pwd-dialog__btn--cancel {
+          background: rgba(255,255,255,0.04);
+          color: #8B8B9E;
+          border: 1px solid rgba(255,255,255,0.08);
+        }
+        .pwd-dialog__btn--cancel:hover { color: #E0E0F0; }
+        .pwd-dialog__btn--submit {
+          background: linear-gradient(135deg, #7C3AED, #EC4899);
+          color: #FFFFFF;
+        }
+        .pwd-dialog__btn--submit:hover { opacity: 0.9; }
+        .pwd-dialog__btn--submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
         .works-page {
           padding-top: 64px;
           min-height: 100vh;
