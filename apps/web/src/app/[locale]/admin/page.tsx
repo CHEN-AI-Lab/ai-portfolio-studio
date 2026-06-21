@@ -5,6 +5,8 @@ import { useTranslations, useLocale } from 'next-intl'
 import { Link } from '@/navigation'
 import { CATEGORIES } from 'shared'
 import type { WorkItem } from 'shared'
+import { UploadModal } from '@/components/UploadModal'
+import { EditWorkModal } from '@/components/EditWorkModal'
 
 // Admin-specific type that extends WorkItem with view tracking
 interface AdminWork extends WorkItem {
@@ -24,6 +26,22 @@ export default function AdminPage() {
   // Data
   const [works, setWorks] = useState<AdminWork[]>([])
   const [loading, setLoading] = useState(true)
+
+  // Modals
+  const [showUploadModal, setShowUploadModal] = useState(false)
+  const [editingWork, setEditingWork] = useState<AdminWork | null>(null)
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (!toast) return
+    const timer = setTimeout(() => setToast(null), 3000)
+    return () => clearTimeout(timer)
+  }, [toast])
+
+  const handleNotify = useCallback((message: string, type: 'success' | 'error') => {
+    setToast({ message, type })
+  }, [])
 
   // Fetch works from Supabase
   const fetchWorks = useCallback(async () => {
@@ -86,6 +104,7 @@ export default function AdminPage() {
       const data = await res.json()
       if (data.success) {
         setWorks(prev => prev.filter(w => w.id !== id))
+        handleNotify(t('deleteSuccess') || 'Deleted', 'success')
       }
     } catch {}
   }
@@ -203,9 +222,23 @@ export default function AdminPage() {
             <h1 className="admin-header__title">{t('title')}</h1>
             <p className="admin-header__subtitle">{t('subtitle')}</p>
           </div>
-          <Link href="/works" className="admin-header__back">
-            ← {t('backToSite')}
-          </Link>
+          <div className="admin-header__actions">
+            <button
+              type="button"
+              className="admin-header__upload-btn"
+              onClick={() => setShowUploadModal(true)}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              <span>{locale === 'zh-CN' ? '上传' : 'Upload'}</span>
+            </button>
+            <Link href="/works" className="admin-header__back">
+              ← {t('backToSite')}
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -275,12 +308,21 @@ export default function AdminPage() {
                         </button>
                       </td>
                       <td>
-                        <button
-                          className="admin-table__delete-btn"
-                          onClick={() => handleDelete(w.id!)}
-                        >
-                          ✕
-                        </button>
+                        <div className="admin-table__action-btns">
+                          <button
+                            className="admin-table__edit-btn"
+                            onClick={() => setEditingWork(w)}
+                            title={locale === 'zh-CN' ? '编辑' : 'Edit'}
+                          >
+                            ✎
+                          </button>
+                          <button
+                            className="admin-table__delete-btn"
+                            onClick={() => handleDelete(w.id!)}
+                          >
+                            ✕
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )
@@ -290,6 +332,38 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
+      {/* Upload Modal */}
+      <UploadModal
+        open={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onSuccess={() => {
+          setShowUploadModal(false)
+          fetchWorks()
+        }}
+        onNotify={handleNotify}
+      />
+
+      {/* Edit Work Modal */}
+      {editingWork && (
+        <EditWorkModal
+          work={editingWork}
+          onClose={() => setEditingWork(null)}
+          onSaved={() => {
+            setEditingWork(null)
+            fetchWorks()
+          }}
+          onNotify={handleNotify}
+        />
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <div className={`admin-toast admin-toast--${toast.type}`}>
+          <span className="admin-toast-icon">{toast.type === 'success' ? '✓' : '✕'}</span>
+          <span>{toast.message}</span>
+        </div>
+      )}
 
       <style>{`
         .admin-page {
@@ -321,11 +395,35 @@ export default function AdminPage() {
           color: #6B6B80;
           margin: 0;
         }
+        .admin-header__actions {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .admin-header__upload-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 16px;
+          font-size: 0.875rem;
+          font-weight: 600;
+          font-family: inherit;
+          color: #FFFFFF;
+          background: linear-gradient(135deg, #7C3AED, #EC4899);
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          white-space: nowrap;
+        }
+        .admin-header__upload-btn:hover {
+          opacity: 0.9;
+        }
         .admin-header__back {
           color: #A78BFA;
           text-decoration: none;
           font-size: 0.875rem;
           font-weight: 500;
+          white-space: nowrap;
         }
         .admin-header__back:hover { color: #C4B5FD; }
 
@@ -426,6 +524,22 @@ export default function AdminPage() {
         }
         .admin-table__featured-btn.active { color: #FBBF24; }
         .admin-table__featured-btn:hover { opacity: 0.8; }
+        .admin-table__action-btns {
+          display: flex;
+          gap: 6px;
+        }
+        .admin-table__edit-btn {
+          background: rgba(96,165,250,0.1);
+          border: 1px solid rgba(96,165,250,0.2);
+          color: #93C5FD;
+          border-radius: 6px;
+          padding: 4px 10px;
+          cursor: pointer;
+          font-size: 0.875rem;
+        }
+        .admin-table__edit-btn:hover {
+          background: rgba(96,165,250,0.2);
+        }
         .admin-table__delete-btn {
           background: rgba(239,68,68,0.1);
           border: 1px solid rgba(239,68,68,0.2);
@@ -437,6 +551,37 @@ export default function AdminPage() {
         }
         .admin-table__delete-btn:hover {
           background: rgba(239,68,68,0.2);
+        }
+
+        /* Toast */
+        .admin-toast {
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px 20px;
+          border-radius: 8px;
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #FFFFFF;
+          z-index: 1100;
+          animation: admin-toast-in 0.2s ease-out;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .admin-toast--success {
+          background: #065F46;
+          border: 1px solid rgba(52,211,153,0.3);
+        }
+        .admin-toast--error {
+          background: #7F1D1D;
+          border: 1px solid rgba(248,113,113,0.3);
+        }
+        .admin-toast-icon { font-size: 1rem; }
+        @keyframes admin-toast-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </div>
