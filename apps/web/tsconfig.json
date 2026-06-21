@@ -9,21 +9,10 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "shared": [
-        "../../shared"
-      ],
-      "shared/*": [
-        "../../shared/*"
-      ],
-      "next-intl": [
-        "./node_modules/next-intl"
-      ],
-      "zod": [
-        "./node_modules/zod"
-      ]
+      "@/*": ["./src/*"],
+      "shared": ["../../shared"],
+      "shared/*": ["../../shared/*"],
+      "*": ["./node_modules/*"]
     },
     "noEmit": true,
     "incremental": true,
