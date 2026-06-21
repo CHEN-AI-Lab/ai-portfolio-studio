@@ -18,7 +18,7 @@ apps/studio/
 apps/docs/
 
 # Root works directory
-works/
-works/_inbox/
+/works/
+/works/_inbox/
 
 # pnpm-lock.yaml — KEEP
