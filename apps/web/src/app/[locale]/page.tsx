@@ -132,7 +132,7 @@ export default function HomePage() {
 
         /* ─── Category Sections ───────────────────────────────── */
         .home-cat-section {
-          padding: 3rem 0;
+          padding: 2rem 0;
           background: #12121A;
           position: relative;
         }
@@ -141,7 +141,7 @@ export default function HomePage() {
         }
         @media (max-width: 767px) {
           .home-cat-section {
-            padding: 2rem 0;
+            padding: 1.5rem 0;
           }
         }
         .home-cat-section__container {
@@ -158,7 +158,7 @@ export default function HomePage() {
           display: flex;
           align-items: center;
           gap: 1rem;
-          margin-bottom: 1.5rem;
+          margin-bottom: 1rem;
         }
         .home-cat-section__icon {
           flex-shrink: 0;
