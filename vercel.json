@@ -1,3 +1,5 @@
 {
-  "rootDirectory": "apps/web"
+  "rootDirectory": "apps/web",
+  "nodeVersion": "22.x",
+  "framework": "nextjs"
 }
