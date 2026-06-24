@@ -86,11 +86,16 @@ export default function HomePage() {
 
       {/* Category Showcases — real works, one section per category */}
       {activeCategories.map((cat, catIndex) => {
-        const catWorks = ALL_WORKS.filter(w => w.category === cat.id).slice(0, 4)
+        const catWorks = ALL_WORKS.filter(w => w.category === cat.id).slice(0, 8)
+        const videos = catWorks.filter(w => w.type === 'video')
+        const images = catWorks.filter(w => w.type === 'image')
         const catLabel = locale === 'zh-CN' ? cat.label.zh : cat.label.en
+        const hasMixedTypes = videos.length > 0 && images.length > 0
+
         return (
           <section key={cat.id} className="home-cat-section" aria-labelledby={`home-cat-${cat.id}`}>
             <div className="home-cat-section__container">
+              {/* ─── Category Header ─── */}
               <div className="home-cat-section__header">
                 <div className="home-cat-section__icon" aria-hidden="true">{cat.icon}</div>
                 <h2 id={`home-cat-${cat.id}`} className="home-cat-section__title">{catLabel}</h2>
@@ -100,13 +105,44 @@ export default function HomePage() {
                   <span className="home-cat-section__view-all-icon" aria-hidden="true">→</span>
                 </Link>
               </div>
-              <div className={`home-cat-section__works${catWorks.length <= 2 ? ' home-cat-section__works--sparse' : ''}`} role="list">
-                {catWorks.map((w, i) => (
-                  <div key={w.id} role="listitem" className="home-cat-section__work-item">
-                    <WorkCard work={w} index={i} />
+
+              {/* ─── Videos Row ─── */}
+              {videos.length > 0 && (
+                <div className="home-cat-section__media-group">
+                  {hasMixedTypes && (
+                    <div className="home-cat-section__media-label">
+                      <span className="home-cat-section__media-badge home-cat-section__media-badge--video" aria-hidden="true">▶</span>
+                      <span>{workT('video')}</span>
+                    </div>
+                  )}
+                  <div className={`home-cat-section__works${videos.length <= 2 ? ' home-cat-section__works--sparse' : ''}`} role="list">
+                    {videos.map((w, i) => (
+                      <div key={w.id} role="listitem" className="home-cat-section__work-item">
+                        <WorkCard work={w} index={i} />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
+
+              {/* ─── Images Row ─── */}
+              {images.length > 0 && (
+                <div className="home-cat-section__media-group">
+                  {hasMixedTypes && (
+                    <div className="home-cat-section__media-label">
+                      <span className="home-cat-section__media-badge home-cat-section__media-badge--image" aria-hidden="true">🖼</span>
+                      <span>{workT('image')}</span>
+                    </div>
+                  )}
+                  <div className={`home-cat-section__works${images.length <= 2 ? ' home-cat-section__works--sparse' : ''}`} role="list">
+                    {images.map((w, i) => (
+                      <div key={w.id} role="listitem" className="home-cat-section__work-item">
+                        <WorkCard work={w} index={i + videos.length} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </section>
         )
@@ -255,6 +291,43 @@ export default function HomePage() {
         }
         .home-cat-section__work-item:hover {
           transform: translateY(-4px);
+        }
+
+        /* ─── Media type separation (videos / images) ──────────── */
+        .home-cat-section__media-group {
+          margin-bottom: 1.25rem;
+        }
+        .home-cat-section__media-group:last-child {
+          margin-bottom: 0;
+        }
+        .home-cat-section__media-label {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #6B6B80;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          margin-bottom: 0.625rem;
+        }
+        .home-cat-section__media-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+          border-radius: 4px;
+          font-size: 0.65rem;
+          flex-shrink: 0;
+        }
+        .home-cat-section__media-badge--video {
+          background: rgba(124, 58, 237, 0.15);
+          color: #A78BFA;
+        }
+        .home-cat-section__media-badge--image {
+          background: rgba(59, 130, 246, 0.15);
+          color: #60A5FA;
         }
       `}</style>
     </div>
