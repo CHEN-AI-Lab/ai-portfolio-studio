@@ -10,9 +10,20 @@ interface FeaturedCarouselProps {
   works: WorkItem[]
 }
 
-export function FeaturedCarousel({ works }: FeaturedCarouselProps) {
-  const t = useTranslations('work')
-  const locale = useLocale()
+// ─── Scrollable Track ─────────────────────────────────────────────
+// Renders a horizontal scrollable row of work cards for a single media type.
+
+function MediaTrack({
+  works,
+  type,
+  label,
+  icon,
+}: {
+  works: WorkItem[]
+  type: 'video' | 'image'
+  label: string
+  icon: string
+}) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
@@ -43,15 +54,16 @@ export function FeaturedCarousel({ works }: FeaturedCarouselProps) {
     el.scrollBy({ left: dir === 'left' ? -amount : amount, behavior: 'smooth' })
   }
 
-  if (!works || works.length === 0) return null
-
   return (
-    <section className="featured-carousel" aria-label={t('featured')}>
-      <div className="featured-carousel__header">
-        <h2 className="featured-carousel__title">
-          <span className="featured-carousel__title-icon" aria-hidden="true">★</span>
-          {t('featured')}
-        </h2>
+    <div className="featured-carousel__track-group">
+      {/* Track label + arrows */}
+      <div className="featured-carousel__track-header">
+        <div className="featured-carousel__track-label">
+          <span className={`featured-carousel__track-badge featured-carousel__track-badge--${type}`}>
+            {icon}
+          </span>
+          <span>{label}</span>
+        </div>
         <div className="featured-carousel__arrows">
           <button
             className={`featured-carousel__arrow${canScrollLeft ? '' : ' disabled'}`}
@@ -119,6 +131,47 @@ export function FeaturedCarousel({ works }: FeaturedCarouselProps) {
           })}
         </div>
       </div>
+    </div>
+  )
+}
+
+// ─── FeaturedCarousel ─────────────────────────────────────────────
+
+export function FeaturedCarousel({ works }: FeaturedCarouselProps) {
+  const t = useTranslations('work')
+
+  if (!works || works.length === 0) return null
+
+  const videos = works.filter(w => w.type === 'video')
+  const images = works.filter(w => w.type === 'image')
+  const hasBoth = videos.length > 0 && images.length > 0
+
+  return (
+    <section className="featured-carousel" aria-label={t('featured')}>
+      <div className="featured-carousel__header">
+        <h2 className="featured-carousel__title">
+          <span className="featured-carousel__title-icon" aria-hidden="true">★</span>
+          {t('featured')}
+        </h2>
+      </div>
+
+      {videos.length > 0 && (
+        <MediaTrack
+          works={videos}
+          type="video"
+          label={t('video')}
+          icon="▶"
+        />
+      )}
+
+      {images.length > 0 && (
+        <MediaTrack
+          works={images}
+          type="image"
+          label={t('image')}
+          icon="🖼"
+        />
+      )}
 
       <style>{`
         .featured-carousel {
@@ -152,6 +205,53 @@ export function FeaturedCarousel({ works }: FeaturedCarouselProps) {
           color: #FBBF24;
         }
 
+        /* ─── Track group (one per media type) ──────────────── */
+        .featured-carousel__track-group {
+          margin-bottom: 1.5rem;
+        }
+        .featured-carousel__track-group:last-child {
+          margin-bottom: 0;
+        }
+
+        .featured-carousel__track-header {
+          max-width: 1280px;
+          margin: 0 auto 0.5rem;
+          padding: 0 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .featured-carousel__track-label {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #6B6B80;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+
+        .featured-carousel__track-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+          border-radius: 4px;
+          font-size: 0.65rem;
+          flex-shrink: 0;
+        }
+        .featured-carousel__track-badge--video {
+          background: rgba(124, 58, 237, 0.15);
+          color: #A78BFA;
+        }
+        .featured-carousel__track-badge--image {
+          background: rgba(59, 130, 246, 0.15);
+          color: #60A5FA;
+        }
+
         .featured-carousel__arrows {
           display: flex;
           gap: 6px;
@@ -161,13 +261,13 @@ export function FeaturedCarousel({ works }: FeaturedCarouselProps) {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 32px;
-          height: 32px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           background: rgba(255,255,255,0.05);
           border: 1px solid rgba(255,255,255,0.08);
           color: #A0A0B0;
-          font-size: 1.25rem;
+          font-size: 1.125rem;
           cursor: pointer;
           transition: all 150ms ease;
         }
