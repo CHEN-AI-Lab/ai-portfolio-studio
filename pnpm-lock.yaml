@@ -331,7 +331,7 @@ importers:
         version: 3.6.40(@swc/helpers@0.5.5)(@tarojs/taro@3.6.40(@tarojs/helper@3.6.40(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@types/react@18.3.30)(postcss@8.5.15))(@types/node@20.19.41)
       '@tarojs/mini-runner':
         specifier: 3.6.40
-        version: 3.6.40(@swc/helpers@0.5.5)(@tarojs/components@3.6.40(@tarojs/helper@3.6.40(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@tarojs/shared@3.6.40)(@types/react@18.3.30)(postcss@8.5.15)(react@18.3.1))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@tarojs/shared@3.6.40)(@tarojs/taro@3.6.40(@tarojs/helper@3.6.40(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@types/react@18.3.30)(postcss@8.5.15))(@types/react@18.3.30)(postcss@8.5.15)
+        version: 3.6.40(@swc/helpers@0.5.5)(@tarojs/components@3.6.40(@tarojs/helper@3.6.40(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@tarojs/shared@3.6.40)(@types/react@18.3.30)(postcss@8.5.15)(react@18.3.1))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@tarojs/shared@3.6.40)(@tarojs/taro@3.6.40(@tarojs/helper@3.6.40(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@types/react@18.3.30)(postcss@8.5.15))(@types/react@18.3.30)(bluebird@3.7.2)(postcss@8.5.15)
       '@tarojs/plugin-platform-weapp':
         specifier: 3.6.40
         version: 3.6.40(@swc/helpers@0.5.5)(@tarojs/components@3.6.40(@tarojs/helper@3.6.40(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@tarojs/shared@3.6.40)(@types/react@18.3.30)(postcss@8.5.15)(react@18.3.1))(@tarojs/shared@3.6.40)(@tarojs/taro@3.6.40(@tarojs/helper@3.6.40(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@types/react@18.3.30)(postcss@8.5.15))
@@ -368,6 +368,9 @@ importers:
       shared:
         specifier: file:../../shared
         version: link:../../shared
+      zod:
+        specifier: ^3.22.0
+        version: 3.25.76
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -12561,7 +12564,7 @@ snapshots:
       - '@swc/helpers'
       - supports-color
 
-  '@tarojs/mini-runner@3.6.40(@swc/helpers@0.5.5)(@tarojs/components@3.6.40(@tarojs/helper@3.6.40(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@tarojs/shared@3.6.40)(@types/react@18.3.30)(postcss@8.5.15)(react@18.3.1))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@tarojs/shared@3.6.40)(@tarojs/taro@3.6.40(@tarojs/helper@3.6.40(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@types/react@18.3.30)(postcss@8.5.15))(@types/react@18.3.30)(postcss@8.5.15)':
+  '@tarojs/mini-runner@3.6.40(@swc/helpers@0.5.5)(@tarojs/components@3.6.40(@tarojs/helper@3.6.40(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@tarojs/shared@3.6.40)(@types/react@18.3.30)(postcss@8.5.15)(react@18.3.1))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@tarojs/shared@3.6.40)(@tarojs/taro@3.6.40(@tarojs/helper@3.6.40(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.40(@tarojs/shared@3.6.40))(@types/react@18.3.30)(postcss@8.5.15))(@types/react@18.3.30)(bluebird@3.7.2)(postcss@8.5.15)':
     dependencies:
       '@babel/core': 7.29.7
       '@tarojs/helper': 3.6.40(@swc/helpers@0.5.5)
@@ -12610,7 +12613,7 @@ snapshots:
       sax: 1.2.4
       stylus: 0.55.0
       stylus-loader: 3.0.2(stylus@0.55.0)
-      terser-webpack-plugin: 3.1.0(webpack@4.46.0)
+      terser-webpack-plugin: 3.1.0(bluebird@3.7.2)(webpack@4.46.0)
       url-loader: 4.1.1(file-loader@6.2.0(webpack@4.46.0))(webpack@4.46.0)
       vm2: 3.11.5
       webpack: 4.46.0
@@ -14445,7 +14448,7 @@ snapshots:
       unique-filename: 1.1.1
       y18n: 4.0.3
 
-  cacache@15.3.0:
+  cacache@15.3.0(bluebird@3.7.2):
     dependencies:
       '@npmcli/fs': 1.1.1
       '@npmcli/move-file': 1.1.2
@@ -20991,9 +20994,9 @@ snapshots:
       webpack-sources: 1.4.3
       worker-farm: 1.7.0
 
-  terser-webpack-plugin@3.1.0(webpack@4.46.0):
+  terser-webpack-plugin@3.1.0(bluebird@3.7.2)(webpack@4.46.0):
     dependencies:
-      cacache: 15.3.0
+      cacache: 15.3.0(bluebird@3.7.2)
       find-cache-dir: 3.3.2
       jest-worker: 26.6.2
       p-limit: 3.1.0
